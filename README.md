@@ -26,6 +26,8 @@ docker compose stop
 
 ## Développement local
 
+Pour héberger l’application sur Internet, consulter [le guide Render](DEPLOYMENT.md). Le fichier [render.yaml](render.yaml) prépare un service HTTPS, PostgreSQL 17 et un disque privé persistant à Francfort.
+
 Prérequis : Node.js 24, npm 11, PostgreSQL 17 (Docker recommandé).
 
 ```sh
