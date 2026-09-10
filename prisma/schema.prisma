@@ -1,0 +1,514 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  currency  String   @default("EUR") @db.Char(3)
+  address   String?
+  phone     String?
+  email     String?
+  taxNumber String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+}
+
+model User {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  companyId             String                 @db.Uuid
+  company               Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  name                  String
+  email                 String                 @unique
+  passwordHash          String
+  active                Boolean                @default(true)
+  locale                String                 @default("fr")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  roles                 UserRole[]
+  sessions              Session[]
+  resetTokens           PasswordResetToken[]
+  salesperson           SalespersonProfile?
+  clients               Client[]
+  sales                 Sale[]
+  invoices              Invoice[]
+  payments              Payment[]
+  cashAccounts          CashAccount[]
+  requestedExpenses     Expense[]              @relation("ExpenseRequester")
+  approvedExpenses      Expense[]              @relation("ExpenseApprover")
+  createdTransactions   FinancialTransaction[] @relation("TransactionCreator")
+  validatedTransactions FinancialTransaction[] @relation("TransactionValidator")
+
+  @@unique([companyId, id])
+  @@index([companyId, active])
+}
+
+model Role {
+  id          String           @id @default(uuid()) @db.Uuid
+  companyId   String           @db.Uuid
+  name        String
+  label       String
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@unique([companyId, name])
+  @@unique([companyId, id])
+}
+
+model Permission {
+  id    String           @id @default(uuid()) @db.Uuid
+  key   String           @unique
+  label String?
+  roles RolePermission[]
+}
+
+model RolePermission {
+  companyId    String     @db.Uuid
+  roleId       String     @db.Uuid
+  permissionId String     @db.Uuid
+  role         Role       @relation(fields: [companyId, roleId], references: [companyId, id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  companyId String @db.Uuid
+  userId    String @db.Uuid
+  roleId    String @db.Uuid
+  user      User   @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Cascade)
+  role      Role   @relation(fields: [companyId, roleId], references: [companyId, id], onDelete: Restrict)
+
+  @@id([userId, roleId])
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  companyId String   @db.Uuid
+  userId    String   @db.Uuid
+  tokenHash String   @unique
+  user      User     @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  companyId String    @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Client {
+  id               String                 @id @default(uuid()) @db.Uuid
+  companyId        String                 @db.Uuid
+  name             String
+  businessName     String?
+  phone            String?
+  email            String?
+  address          String?
+  city             String?
+  country          String?                @default("France")
+  taxNumber        String?
+  notes            String?
+  salespersonId    String?                @db.Uuid
+  salesperson      User?                  @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  creditLimitMinor BigInt                 @default(0)
+  active           Boolean                @default(true)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  sales            Sale[]
+  invoices         Invoice[]
+  payments         Payment[]
+  transactions     FinancialTransaction[]
+
+  @@unique([companyId, id])
+  @@index([companyId, name])
+  @@index([companyId, salespersonId])
+}
+
+model Supplier {
+  id           String                 @id @default(uuid()) @db.Uuid
+  companyId    String                 @db.Uuid
+  name         String
+  businessName String?
+  phone        String?
+  email        String?
+  address      String?
+  taxNumber    String?
+  bankDetails  String?
+  notes        String?
+  active       Boolean                @default(true)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  expenses     Expense[]
+  transactions FinancialTransaction[]
+
+  @@unique([companyId, id])
+  @@index([companyId, name])
+}
+
+model SalespersonProfile {
+  id                String   @id @default(uuid()) @db.Uuid
+  companyId         String   @db.Uuid
+  userId            String   @unique @db.Uuid
+  user              User     @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Restrict)
+  commissionPercent Decimal  @default(0) @db.Decimal(7, 4)
+  phone             String?
+  createdAt         DateTime @default(now())
+
+  @@unique([companyId, id])
+  @@unique([companyId, userId])
+}
+
+model CashAccount {
+  id            String    @id @default(uuid()) @db.Uuid
+  companyId     String    @db.Uuid
+  name          String
+  type          String    @default("CASH")
+  currency      String    @default("EUR") @db.Char(3)
+  responsibleId String?   @db.Uuid
+  responsible   User?     @relation(fields: [companyId, responsibleId], references: [companyId, id], onDelete: Restrict)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  payments      Payment[]
+  expenses      Expense[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, name])
+}
+
+model Sale {
+  id             String     @id @default(uuid()) @db.Uuid
+  companyId      String     @db.Uuid
+  number         String
+  clientId       String     @db.Uuid
+  client         Client     @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
+  salespersonId  String?    @db.Uuid
+  salesperson    User?      @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  date           DateTime   @default(now())
+  status         String     @default("INVOICED")
+  currency       String     @default("EUR") @db.Char(3)
+  subtotalMinor  BigInt
+  discountMinor  BigInt     @default(0)
+  taxMinor       BigInt     @default(0)
+  totalMinor     BigInt
+  notes          String?
+  createdById    String     @db.Uuid
+  idempotencyKey String     @db.Uuid
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  lines          SaleLine[]
+  invoice        Invoice?
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, date])
+  @@index([companyId, salespersonId])
+}
+
+model SaleLine {
+  id              String  @id @default(uuid()) @db.Uuid
+  companyId       String  @db.Uuid
+  saleId          String  @db.Uuid
+  sale            Sale    @relation(fields: [companyId, saleId], references: [companyId, id], onDelete: Restrict)
+  description     String
+  quantity        Decimal @db.Decimal(18, 4)
+  unitPrice       Decimal @db.Decimal(18, 4)
+  discountPercent Decimal @default(0) @db.Decimal(7, 4)
+  taxPercent      Decimal @default(0) @db.Decimal(7, 4)
+  subtotalMinor   BigInt
+  discountMinor   BigInt
+  taxMinor        BigInt
+  totalMinor      BigInt
+  position        Int
+
+  @@index([companyId, saleId])
+}
+
+model Invoice {
+  id            String                 @id @default(uuid()) @db.Uuid
+  companyId     String                 @db.Uuid
+  number        String
+  saleId        String                 @unique @db.Uuid
+  sale          Sale                   @relation(fields: [companyId, saleId], references: [companyId, id], onDelete: Restrict)
+  clientId      String                 @db.Uuid
+  client        Client                 @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
+  salespersonId String?                @db.Uuid
+  salesperson   User?                  @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  date          DateTime               @default(now())
+  dueDate       DateTime
+  status        String                 @default("ISSUED")
+  currency      String                 @default("EUR") @db.Char(3)
+  subtotalMinor BigInt
+  discountMinor BigInt                 @default(0)
+  taxMinor      BigInt                 @default(0)
+  totalMinor    BigInt
+  paidMinor     BigInt                 @default(0)
+  notes         String?
+  terms         String?
+  createdById   String                 @db.Uuid
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  lines         InvoiceLine[]
+  payments      Payment[]
+  transactions  FinancialTransaction[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, saleId])
+  @@unique([companyId, number])
+  @@index([companyId, status, dueDate])
+  @@index([companyId, salespersonId])
+}
+
+model InvoiceLine {
+  id              String  @id @default(uuid()) @db.Uuid
+  companyId       String  @db.Uuid
+  invoiceId       String  @db.Uuid
+  invoice         Invoice @relation(fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+  description     String
+  quantity        Decimal @db.Decimal(18, 4)
+  unitPrice       Decimal @db.Decimal(18, 4)
+  discountPercent Decimal @default(0) @db.Decimal(7, 4)
+  taxPercent      Decimal @default(0) @db.Decimal(7, 4)
+  subtotalMinor   BigInt
+  discountMinor   BigInt
+  taxMinor        BigInt
+  totalMinor      BigInt
+  position        Int
+
+  @@index([companyId, invoiceId])
+}
+
+model Payment {
+  id             String       @id @default(uuid()) @db.Uuid
+  companyId      String       @db.Uuid
+  number         String
+  invoiceId      String       @db.Uuid
+  invoice        Invoice      @relation(fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+  clientId       String       @db.Uuid
+  client         Client       @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
+  amountMinor    BigInt
+  currency       String       @default("EUR") @db.Char(3)
+  method         String
+  cashAccountId  String?      @db.Uuid
+  cashAccount    CashAccount? @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
+  salespersonId  String?      @db.Uuid
+  salesperson    User?        @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  date           DateTime     @default(now())
+  reference      String?
+  comment        String?
+  status         String       @default("VALIDATED")
+  createdById    String       @db.Uuid
+  idempotencyKey String       @db.Uuid
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, date])
+}
+
+model ExpenseCategory {
+  id        String    @id @default(uuid()) @db.Uuid
+  companyId String    @db.Uuid
+  name      String
+  expenses  Expense[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, name])
+}
+
+model Expense {
+  id             String                 @id @default(uuid()) @db.Uuid
+  companyId      String                 @db.Uuid
+  number         String
+  requesterId    String                 @db.Uuid
+  requester      User                   @relation("ExpenseRequester", fields: [companyId, requesterId], references: [companyId, id], onDelete: Restrict)
+  supplierId     String?                @db.Uuid
+  supplier       Supplier?              @relation(fields: [companyId, supplierId], references: [companyId, id], onDelete: Restrict)
+  categoryId     String?                @db.Uuid
+  category       ExpenseCategory?       @relation(fields: [companyId, categoryId], references: [companyId, id], onDelete: Restrict)
+  description    String
+  amountMinor    BigInt
+  currency       String                 @default("EUR") @db.Char(3)
+  date           DateTime               @default(now())
+  method         String?
+  cashAccountId  String?                @db.Uuid
+  cashAccount    CashAccount?           @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
+  comment        String?
+  approverId     String?                @db.Uuid
+  approver       User?                  @relation("ExpenseApprover", fields: [companyId, approverId], references: [companyId, id], onDelete: Restrict)
+  approvedAt     DateTime?
+  paidAt         DateTime?
+  status         String                 @default("PENDING")
+  idempotencyKey String                 @db.Uuid
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  transactions   FinancialTransaction[]
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, status, date])
+  @@index([companyId, requesterId])
+}
+
+model FinancialTransaction {
+  id                       String                @id @default(uuid()) @db.Uuid
+  companyId                String                @db.Uuid
+  number                   String
+  type                     String
+  amountMinor              BigInt
+  currency                 String                @default("EUR") @db.Char(3)
+  sourceCashAccountId      String?               @db.Uuid
+  destinationCashAccountId String?               @db.Uuid
+  sourceSalespersonId      String?               @db.Uuid
+  destinationSalespersonId String?               @db.Uuid
+  clientId                 String?               @db.Uuid
+  client                   Client?               @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
+  supplierId               String?               @db.Uuid
+  supplier                 Supplier?             @relation(fields: [companyId, supplierId], references: [companyId, id], onDelete: Restrict)
+  invoiceId                String?               @db.Uuid
+  invoice                  Invoice?              @relation(fields: [companyId, invoiceId], references: [companyId, id], onDelete: Restrict)
+  expenseId                String?               @db.Uuid
+  expense                  Expense?              @relation(fields: [companyId, expenseId], references: [companyId, id], onDelete: Restrict)
+  paymentId                String?               @db.Uuid
+  date                     DateTime              @default(now())
+  createdById              String                @db.Uuid
+  creator                  User                  @relation("TransactionCreator", fields: [companyId, createdById], references: [companyId, id], onDelete: Restrict)
+  validatedById            String                @db.Uuid
+  validator                User                  @relation("TransactionValidator", fields: [companyId, validatedById], references: [companyId, id], onDelete: Restrict)
+  status                   String                @default("VALIDATED")
+  comment                  String?
+  reference                String?
+  reversalOfId             String?               @unique @db.Uuid
+  reversalOf               FinancialTransaction? @relation("Reversal", fields: [reversalOfId], references: [id], onDelete: Restrict)
+  reversal                 FinancialTransaction? @relation("Reversal")
+  idempotencyKey           String                @db.Uuid
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+
+  @@unique([companyId, id])
+  @@unique([companyId, number])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, date])
+  @@index([companyId, sourceCashAccountId])
+  @@index([companyId, destinationCashAccountId])
+  @@index([companyId, sourceSalespersonId])
+  @@index([companyId, destinationSalespersonId])
+}
+
+model CashTransfer {
+  id                       String   @id @default(uuid()) @db.Uuid
+  companyId                String   @db.Uuid
+  sourceCashAccountId      String   @db.Uuid
+  destinationCashAccountId String   @db.Uuid
+  amountMinor              BigInt
+  transactionId            String   @unique @db.Uuid
+  createdById              String   @db.Uuid
+  date                     DateTime @default(now())
+  comment                  String?
+  idempotencyKey           String   @db.Uuid
+  createdAt                DateTime @default(now())
+
+  @@unique([companyId, id])
+  @@unique([companyId, idempotencyKey])
+}
+
+model SalespersonCashHandover {
+  id             String   @id @default(uuid()) @db.Uuid
+  companyId      String   @db.Uuid
+  salespersonId  String   @db.Uuid
+  cashAccountId  String   @db.Uuid
+  amountMinor    BigInt
+  transactionId  String   @unique @db.Uuid
+  createdById    String   @db.Uuid
+  date           DateTime @default(now())
+  comment        String?
+  idempotencyKey String   @db.Uuid
+  createdAt      DateTime @default(now())
+
+  @@unique([companyId, id])
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, salespersonId])
+}
+
+model Attachment {
+  id           String   @id @default(uuid()) @db.Uuid
+  companyId    String   @db.Uuid
+  entity       String
+  entityId     String   @db.Uuid
+  filename     String
+  storageKey   String   @unique
+  mimeType     String
+  size         Int
+  uploadedById String   @db.Uuid
+  createdAt    DateTime @default(now())
+
+  @@index([companyId, entity, entityId])
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  companyId String    @db.Uuid
+  userId    String    @db.Uuid
+  title     String
+  message   String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([companyId, userId, readAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  companyId String   @db.Uuid
+  userId    String?  @db.Uuid
+  userName  String
+  action    String
+  entity    String
+  entityId  String
+  before    Json?
+  after     Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([companyId, createdAt])
+  @@index([companyId, entity, entityId])
+}
+
+model DocumentSequence {
+  companyId String @db.Uuid
+  type      String
+  year      Int
+  value     Int    @default(0)
+
+  @@id([companyId, type, year])
+}

@@ -1,0 +1,9 @@
+node_modules
+.next
+.local
+package-lock.json
+prisma/migrations
+uploads
+*.tsbuildinfo
+AGENTS.md
+CLAUDE.md

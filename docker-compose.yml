@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-orange}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Définir POSTGRES_PASSWORD dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:-orange}
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+  migrate:
+    build:
+      context: .
+      target: tools
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-orange}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-orange}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["npm", "run", "db:migrate"]
+  app:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-orange}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-orange}?schema=public
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - private_uploads:/app/uploads
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  seed:
+    profiles: ["tools"]
+    build:
+      context: .
+      target: tools
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-orange}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-orange}?schema=public
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: ["npm", "run", "db:seed"]
+volumes:
+  postgres_data:
+  private_uploads:

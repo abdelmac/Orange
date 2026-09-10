@@ -1,0 +1,56 @@
+{
+  "name": "orange-finance",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "prisma generate && next build --webpack && node scripts/clean-standalone.mjs",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "tsx tests/integration.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "setup:env": "node scripts/setup-env.mjs",
+    "test:http": "tsx tests/http-e2e.ts",
+    "company:create": "tsx scripts/create-company.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "decimal.js": "^10.6.0",
+    "lucide-react": "^0.577.0",
+    "next": "^16.2.0",
+    "nodemailer": "^10.0.3",
+    "pdf-lib": "^1.17.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4.2.0",
+    "@types/node": "^24.0.0",
+    "@types/nodemailer": "^7.0.11",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.2.0",
+    "prettier": "^3.9.6",
+    "prisma": "^6.19.0",
+    "tailwindcss": "^4.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.0"
+  }
+}
