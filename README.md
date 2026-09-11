@@ -2,6 +2,8 @@
 
 Application française de gestion des ventes, factures, encaissements, caisses et dépenses d’une petite entreprise. Les formulaires enregistrent réellement leurs données dans PostgreSQL. Les permissions sont vérifiées sur le serveur et chaque opération est rattachée à une entreprise.
 
+**Application en ligne : [orange-finance.onrender.com](https://orange-finance.onrender.com).** Déployée sur Render à Francfort avec PostgreSQL et stockage privé persistant. Voir [le suivi du déploiement](DEPLOYMENT.md).
+
 ## Démarrage rapide avec Docker
 
 Prérequis : Docker Desktop démarré (ou Docker Engine + Compose), Node.js 24 pour générer le fichier d’environnement. Les ports 3000 et 5434 doivent être libres.

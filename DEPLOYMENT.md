@@ -2,6 +2,23 @@
 
 Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orange à Francfort avec PostgreSQL 17 et un disque privé pour les justificatifs. Le déploiement local Docker reste disponible.
 
+## Déploiement actif — 11 septembre 2026
+
+- Application : **https://orange-finance.onrender.com**.
+- [Service Render existant](https://dashboard.render.com/web/srv-dai090bm8hqs73dkpgk0).
+- [Base PostgreSQL existante](https://dashboard.render.com/d/dpg-dai023ijnfac73acjtpg-a), accès réseau privé uniquement.
+- Région : Francfort ; disque privé monté sur `/var/data`, capacité 1 Go.
+- Version applicative déployée : `f38f8b1777493bb348a2154e60a7fc5ef1a8da06` ; migrations appliquées avec succès.
+- Entreprise initialisée : **Orange**, une caisse vide et un administrateur utilisant l’adresse du compte Render authentifié. Les données locales de démonstration et de test n’ont pas été importées.
+
+Les ressources ont été créées via l’API Render avec la configuration de `render.yaml`. Pour mettre cette installation à jour, redéployer le service existant ; ne pas recréer la base ni relancer l’initialisation de l’entreprise.
+
+Les identifiants de connexion sont conservés sur la machine de déploiement dans `.local/production-access.json`, fichier exclu de Git et protégé par les permissions Windows. Aucun mot de passe n’est publié dans le dépôt. Les quatre variables temporaires de création de l’administrateur ont été retirées du service après la réussite de l’initialisation.
+
+Contrôles réalisés sur l’URL de production : connexion PostgreSQL, login administrateur, cookie Secure/HttpOnly/SameSite, refus des accès financiers anonymes, protection contre les mutations depuis une origine étrangère, tableau de bord à zéro, interface Chrome ordinateur et mobile sans erreur JavaScript, manifeste PWA et absence de données privées dans son cache. Aucune opération financière de test n’a été ajoutée à la base de production. Les résultats et captures sont conservés localement sous `.local/`.
+
+SMTP reste à configurer pour les emails de récupération de mot de passe. Le premier justificatif réel devra aussi faire l’objet du contrôle de persistance après redémarrage décrit ci-dessous.
+
 ## Ressources et coût
 
 | Ressource            | Configuration                                                      | Coût mensuel indicatif |
@@ -14,7 +31,7 @@ Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orang
 
 Tarifs vérifiés le 10 septembre 2026 : [tarifs Render](https://render.com/pricing), [stockage et facturation](https://render.com/articles/how-much-does-cloud-application-hosting-cost-for-small-businesses). Aucun changement automatique de taille ni déploiement à chaque commit n’est configuré. Un disque persistant nécessite une instance payante ; les redéploiements de cette instance peuvent interrompre brièvement l’application.
 
-## Créer les ressources
+## Créer les ressources pour une nouvelle installation
 
 1. Activer la facturation du workspace Render et approuver le budget.
 2. Ouvrir [la création du Blueprint](https://dashboard.render.com/blueprint/new?repo=https%3A%2F%2Fgithub.com%2Fabdelmac%2FOrange) et sélectionner le workspace souhaité.
