@@ -5,6 +5,7 @@ import { hasPermission } from "@/lib/rbac";
 import { invoiceScope, transactionScope } from "@/lib/record-access";
 import { clientScope } from "@/lib/rbac";
 import { parseMoney } from "@/lib/money";
+import { transactionSearch } from "@/services/daybook.service";
 export async function GET(request: Request) {
   return withApi(async () => {
     const actor = await getActor(request),
@@ -61,16 +62,7 @@ export async function GET(request: Request) {
       hasPermission(actor, "transactions.view")
         ? db.financialTransaction.findMany({
             where: {
-              AND: [
-                transactionScope(actor),
-                {
-                  OR: [
-                    { number: contains },
-                    { reference: contains },
-                    ...(amountMinor === undefined ? [] : [{ amountMinor }]),
-                  ],
-                },
-              ],
+              AND: [transactionScope(actor), transactionSearch(q)],
             },
             select: { id: true, number: true, reference: true },
             take: 6,

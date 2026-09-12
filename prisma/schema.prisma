@@ -44,6 +44,7 @@ model User {
   approvedExpenses      Expense[]              @relation("ExpenseApprover")
   createdTransactions   FinancialTransaction[] @relation("TransactionCreator")
   validatedTransactions FinancialTransaction[] @relation("TransactionValidator")
+  issuedReceipts        TransactionReceipt[]
 
   @@unique([companyId, id])
   @@index([companyId, active])
@@ -345,32 +346,37 @@ model ExpenseCategory {
 }
 
 model Expense {
-  id             String                 @id @default(uuid()) @db.Uuid
-  companyId      String                 @db.Uuid
-  number         String
-  requesterId    String                 @db.Uuid
-  requester      User                   @relation("ExpenseRequester", fields: [companyId, requesterId], references: [companyId, id], onDelete: Restrict)
-  supplierId     String?                @db.Uuid
-  supplier       Supplier?              @relation(fields: [companyId, supplierId], references: [companyId, id], onDelete: Restrict)
-  categoryId     String?                @db.Uuid
-  category       ExpenseCategory?       @relation(fields: [companyId, categoryId], references: [companyId, id], onDelete: Restrict)
-  description    String
-  amountMinor    BigInt
-  currency       String                 @default("EUR") @db.Char(3)
-  date           DateTime               @default(now())
-  method         String?
-  cashAccountId  String?                @db.Uuid
-  cashAccount    CashAccount?           @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
-  comment        String?
-  approverId     String?                @db.Uuid
-  approver       User?                  @relation("ExpenseApprover", fields: [companyId, approverId], references: [companyId, id], onDelete: Restrict)
-  approvedAt     DateTime?
-  paidAt         DateTime?
-  status         String                 @default("PENDING")
-  idempotencyKey String                 @db.Uuid
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
-  transactions   FinancialTransaction[]
+  id                    String                 @id @default(uuid()) @db.Uuid
+  companyId             String                 @db.Uuid
+  number                String
+  requesterId           String                 @db.Uuid
+  requester             User                   @relation("ExpenseRequester", fields: [companyId, requesterId], references: [companyId, id], onDelete: Restrict)
+  supplierId            String?                @db.Uuid
+  supplier              Supplier?              @relation(fields: [companyId, supplierId], references: [companyId, id], onDelete: Restrict)
+  categoryId            String?                @db.Uuid
+  category              ExpenseCategory?       @relation(fields: [companyId, categoryId], references: [companyId, id], onDelete: Restrict)
+  description           String
+  beneficiaryName       String?
+  beneficiaryKind       String?
+  beneficiaryPhone      String?
+  reference             String?
+  quickEntryFingerprint String?                @db.Char(64)
+  amountMinor           BigInt
+  currency              String                 @default("EUR") @db.Char(3)
+  date                  DateTime               @default(now())
+  method                String?
+  cashAccountId         String?                @db.Uuid
+  cashAccount           CashAccount?           @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
+  comment               String?
+  approverId            String?                @db.Uuid
+  approver              User?                  @relation("ExpenseApprover", fields: [companyId, approverId], references: [companyId, id], onDelete: Restrict)
+  approvedAt            DateTime?
+  paidAt                DateTime?
+  status                String                 @default("PENDING")
+  idempotencyKey        String                 @db.Uuid
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  transactions          FinancialTransaction[]
 
   @@unique([companyId, id])
   @@unique([companyId, number])
@@ -413,6 +419,8 @@ model FinancialTransaction {
   idempotencyKey           String                @db.Uuid
   createdAt                DateTime              @default(now())
   updatedAt                DateTime              @updatedAt
+  cashEntry                CashEntry?
+  receipt                  TransactionReceipt?
 
   @@unique([companyId, id])
   @@unique([companyId, number])
@@ -422,6 +430,41 @@ model FinancialTransaction {
   @@index([companyId, destinationCashAccountId])
   @@index([companyId, sourceSalespersonId])
   @@index([companyId, destinationSalespersonId])
+}
+
+model CashEntry {
+  id            String               @id @default(uuid()) @db.Uuid
+  companyId     String               @db.Uuid
+  transactionId String               @unique @db.Uuid
+  transaction   FinancialTransaction @relation(fields: [companyId, transactionId], references: [companyId, id], onDelete: Restrict)
+  partyName     String
+  partyKind     String
+  phone         String?
+  description   String
+  method        String
+  createdAt     DateTime             @default(now())
+
+  @@unique([companyId, id])
+  @@unique([companyId, transactionId])
+  @@index([companyId, partyName])
+  @@index([companyId, createdAt])
+}
+
+model TransactionReceipt {
+  id            String               @id @default(uuid()) @db.Uuid
+  companyId     String               @db.Uuid
+  transactionId String               @unique @db.Uuid
+  transaction   FinancialTransaction @relation(fields: [companyId, transactionId], references: [companyId, id], onDelete: Restrict)
+  number        String
+  snapshot      Json
+  issuedById    String               @db.Uuid
+  issuedBy      User                 @relation(fields: [companyId, issuedById], references: [companyId, id], onDelete: Restrict)
+  createdAt     DateTime             @default(now())
+
+  @@unique([companyId, id])
+  @@unique([companyId, transactionId])
+  @@unique([companyId, number])
+  @@index([companyId, createdAt])
 }
 
 model CashTransfer {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowDownLeft,
+  CalendarDays,
   CreditCard,
   Download,
   Plus,
@@ -128,6 +129,7 @@ export function Dashboard({ report = false }: { report?: boolean }) {
   const commercial = user.role === "SALESPERSON",
     employee = user.role === "EMPLOYEE",
     cashier = user.role === "CASHIER";
+  const canReceive = commercial ? can("payments.create") : can("cash.deposit");
   const load = useCallback(() => {
     setError("");
     api<Row>(`/api/${report ? "reports" : "dashboard"}?period=${period}&from=${from}&to=${to}`)
@@ -147,25 +149,32 @@ export function Dashboard({ report = false }: { report?: boolean }) {
     salespeople = rows(data?.salespersonCollections);
   const actions = [
     {
+      label: "Encaisser",
+      desc: "Saisie rapide et reçu immédiat",
+      href: "/saisie?direction=IN",
+      icon: ArrowDownLeft,
+      permission: commercial ? "payments.create" : "cash.deposit",
+    },
+    {
+      label: can("expenses.create") ? "Demander une dépense" : "Payer une dépense",
+      desc: can("expenses.create") ? "Envoyer pour validation" : "Régler une dépense validée",
+      href: can("expenses.create") ? "/saisie?direction=OUT" : "/depenses?status=APPROVED",
+      icon: CreditCard,
+      permission: can("expenses.create") ? "expenses.create" : "expenses.pay",
+    },
+    {
+      label: "Journal quotidien",
+      desc: "Retrouver les mouvements du jour",
+      href: "/journal",
+      icon: CalendarDays,
+      permission: "transactions.view",
+    },
+    {
       label: "Nouvelle vente",
       desc: "Créer une vente et sa facture",
       href: "/ventes?new=1",
       icon: ShoppingBag,
       permission: "sales.create",
-    },
-    {
-      label: "Encaissement",
-      desc: "Enregistrer un paiement",
-      href: "/encaissements?new=1",
-      icon: ArrowDownLeft,
-      permission: "payments.create",
-    },
-    {
-      label: "Dépense",
-      desc: "Soumettre une demande",
-      href: "/depenses?new=1",
-      icon: CreditCard,
-      permission: "expenses.create",
     },
     {
       label: "Remise caisse",
@@ -234,10 +243,22 @@ export function Dashboard({ report = false }: { report?: boolean }) {
               Exporter
             </a>
           )}
-          {can("sales.create") && !report && (
-            <Link className="button primary" href="/ventes?new=1">
+          {!report && canTransactions && (
+            <Link className="button secondary" href="/journal">
+              <CalendarDays size={16} />
+              Journal quotidien
+            </Link>
+          )}
+          {!report && canReceive && (
+            <Link className="button primary" href="/saisie?direction=IN">
+              <ArrowDownLeft size={18} />
+              Encaisser
+            </Link>
+          )}
+          {!report && !canReceive && can("expenses.create") && (
+            <Link className="button primary" href="/saisie?direction=OUT">
               <Plus size={17} />
-              Nouvelle vente
+              Demander une dépense
             </Link>
           )}
         </div>

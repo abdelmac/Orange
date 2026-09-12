@@ -8,6 +8,7 @@ import { uuid } from "@/lib/validation";
 import { publicUserSelect } from "@/lib/user-select";
 import { expenseScope, invoiceScope, paymentScope, transactionScope } from "@/lib/record-access";
 import { withTransactionLabels } from "./transaction-labels.service";
+import { transactionSearch } from "./daybook.service";
 export { expenseScope, invoiceScope, paymentScope, transactionScope } from "@/lib/record-access";
 
 const person = { select: { id: true, name: true, email: true } } as const;
@@ -37,13 +38,25 @@ const includes = {
     cashAccount: account,
   },
   transaction: {
+    cashEntry: true,
+    receipt: { select: { id: true, number: true } },
     creator: person,
     validator: person,
     invoice,
     client: customer,
     supplier: customer,
-    expense: { select: { id: true, number: true, description: true } },
+    expense: {
+      select: {
+        id: true,
+        number: true,
+        description: true,
+        beneficiaryName: true,
+        beneficiaryKind: true,
+        beneficiaryPhone: true,
+      },
+    },
     reversal: { select: { id: true, number: true } },
+    reversalOf: { select: { cashEntry: true } },
   },
 } satisfies Record<string, unknown>;
 
@@ -216,39 +229,53 @@ export async function listDirectory(
         active: item.user.active,
       }));
     const ids = people.map((item) => item.userId);
-    const [incoming, outgoing, sales, handovers, collections] = await Promise.all([
-      db.financialTransaction.groupBy({
-        by: ["destinationSalespersonId"],
-        where: { companyId, destinationSalespersonId: { in: ids }, status: "VALIDATED" },
-        _sum: { amountMinor: true },
-      }),
-      db.financialTransaction.groupBy({
-        by: ["sourceSalespersonId"],
-        where: { companyId, sourceSalespersonId: { in: ids }, status: "VALIDATED" },
-        _sum: { amountMinor: true },
-      }),
-      db.sale.groupBy({
-        by: ["salespersonId"],
-        where: { companyId, salespersonId: { in: ids }, status: { not: "CANCELLED" } },
-        _sum: { totalMinor: true },
-      }),
-      db.financialTransaction.groupBy({
-        by: ["sourceSalespersonId"],
-        where: { companyId, sourceSalespersonId: { in: ids }, type: "HANDOVER", reversal: null },
-        _sum: { amountMinor: true },
-      }),
-      db.payment.groupBy({
-        by: ["salespersonId"],
-        where: { companyId, salespersonId: { in: ids }, status: "VALIDATED" },
-        _sum: { amountMinor: true },
-      }),
-    ]);
+    const [incoming, outgoing, sales, handovers, collections, quickCollections] = await Promise.all(
+      [
+        db.financialTransaction.groupBy({
+          by: ["destinationSalespersonId"],
+          where: { companyId, destinationSalespersonId: { in: ids }, status: "VALIDATED" },
+          _sum: { amountMinor: true },
+        }),
+        db.financialTransaction.groupBy({
+          by: ["sourceSalespersonId"],
+          where: { companyId, sourceSalespersonId: { in: ids }, status: "VALIDATED" },
+          _sum: { amountMinor: true },
+        }),
+        db.sale.groupBy({
+          by: ["salespersonId"],
+          where: { companyId, salespersonId: { in: ids }, status: { not: "CANCELLED" } },
+          _sum: { totalMinor: true },
+        }),
+        db.financialTransaction.groupBy({
+          by: ["sourceSalespersonId"],
+          where: { companyId, sourceSalespersonId: { in: ids }, type: "HANDOVER", reversal: null },
+          _sum: { amountMinor: true },
+        }),
+        db.payment.groupBy({
+          by: ["salespersonId"],
+          where: { companyId, salespersonId: { in: ids }, status: "VALIDATED" },
+          _sum: { amountMinor: true },
+        }),
+        db.financialTransaction.groupBy({
+          by: ["destinationSalespersonId"],
+          where: {
+            companyId,
+            destinationSalespersonId: { in: ids },
+            type: "CASH_RECEIPT",
+            reversal: null,
+          },
+          _sum: { amountMinor: true },
+        }),
+      ],
+    );
     return people.map((item) => {
       const incomingMinor =
         incoming.find((row) => row.destinationSalespersonId === item.userId)?._sum.amountMinor ??
         0n;
       const collectedMinor =
-        collections.find((row) => row.salespersonId === item.userId)?._sum.amountMinor ?? 0n;
+        (collections.find((row) => row.salespersonId === item.userId)?._sum.amountMinor ?? 0n) +
+        (quickCollections.find((row) => row.destinationSalespersonId === item.userId)?._sum
+          .amountMinor ?? 0n);
       const spentMinor =
         outgoing.find((row) => row.sourceSalespersonId === item.userId)?._sum.amountMinor ?? 0n;
       const salesMinor =
@@ -391,7 +418,14 @@ export async function listDirectory(
             "categoryId",
             "amountMinor",
           ]),
-          search(params, ["number", "description", "comment"]),
+          search(params, [
+            "number",
+            "description",
+            "comment",
+            "beneficiaryName",
+            "beneficiaryPhone",
+            "reference",
+          ]),
         ],
       },
       include: includes.expense,
@@ -420,7 +454,7 @@ export async function listDirectory(
             "createdById",
             "amountMinor",
           ]),
-          search(params, ["number", "reference", "comment"]),
+          transactionSearch(params.get("q")),
           ...(cashId
             ? [
                 {

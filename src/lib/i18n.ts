@@ -59,6 +59,7 @@ export const labels: Record<string, string> = {
   BANK: "Banque",
   RECEIPT: "Encaissement",
   PAYMENT: "Encaissement",
+  CASH_RECEIPT: "Entrée d’argent",
   DISBURSEMENT: "Décaissement",
   EXPENSE: "Dépense",
   CASH_TRANSFER: "Transfert",

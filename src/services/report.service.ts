@@ -87,6 +87,7 @@ async function dashboardSnapshot(
     recentTransactions,
     pendingExpenses,
     salespeople,
+    quickCollections,
   ] = await Promise.all([
     db.company.findUniqueOrThrow({ where: { id: companyId } }),
     canSales
@@ -209,7 +210,17 @@ async function dashboardSnapshot(
           select: { id: true, name: true },
         })
       : [],
+    hasPermission(actor, "payments.view")
+      ? db.financialTransaction.findMany({
+          where: { ...transactionScope(actor), type: "CASH_RECEIPT", reversal: null, date },
+          select: { amountMinor: true, date: true, destinationSalespersonId: true },
+        })
+      : [],
   ]);
+  const allCollections = [
+    ...payments,
+    ...quickCollections.map((row) => ({ ...row, salespersonId: row.destinationSalespersonId })),
+  ];
   const heldMovements = [
     ...heldIncoming.map((row) => ({
       destinationSalespersonId: row.destinationSalespersonId,
@@ -297,7 +308,7 @@ async function dashboardSnapshot(
       salesMinor: selectedSalesMinor,
       expensesMinor: selectedExpensesMinor,
       collectedMinor: sum(
-        payments.filter((p) => within(p.date)),
+        allCollections.filter((p) => within(p.date)),
         (p) => p.amountMinor,
       ),
       receivablesMinor: sum(invoices, (invoice) => invoice.totalMinor - invoice.paidMinor),
@@ -320,7 +331,7 @@ async function dashboardSnapshot(
       id: person.id,
       name: person.name,
       amountMinor: sum(
-        payments.filter((p) => p.salespersonId === person.id && within(p.date)),
+        allCollections.filter((p) => p.salespersonId === person.id && within(p.date)),
         (p) => p.amountMinor,
       ),
       balanceMinor: sum(

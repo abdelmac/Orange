@@ -9,6 +9,7 @@ import { audit } from "./audit.service";
 import { filters, search } from "./directory-read.service";
 import { publicUserSelect } from "@/lib/user-select";
 import { uuid } from "@/lib/validation";
+import { transactionSearch } from "./daybook.service";
 
 export function csvCell(value: unknown) {
   let text = String(value ?? "");
@@ -46,6 +47,12 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
           "Référence",
           "Créé par",
           "Annulation de",
+          "Identifiant stable",
+          "Personne",
+          "Type de personne",
+          "Téléphone",
+          "Motif",
+          "Mode de paiement",
         ];
         const cashId = params.get("cashAccountId"),
           personId = params.get("salespersonId");
@@ -63,7 +70,7 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
                   "createdById",
                   "amountMinor",
                 ]),
-                search(params, ["number", "reference", "comment"]),
+                transactionSearch(params.get("q")),
                 ...(cashId
                   ? [
                       {
@@ -89,6 +96,18 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
             include: {
               creator: { select: { name: true } },
               reversalOf: { select: { number: true } },
+              reversal: { select: { id: true } },
+              cashEntry: true,
+              client: { select: { name: true, phone: true } },
+              expense: {
+                select: {
+                  beneficiaryName: true,
+                  beneficiaryKind: true,
+                  beneficiaryPhone: true,
+                  description: true,
+                  method: true,
+                },
+              },
             },
             orderBy: { date: "asc" },
             take,
@@ -111,6 +130,16 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
           item.reference ?? "",
           item.creator.name,
           item.reversalOf?.number ?? "",
+          item.id,
+          item.cashEntry?.partyName ?? item.expense?.beneficiaryName ?? item.client?.name ?? "",
+          item.cashEntry?.partyKind ??
+            item.expense?.beneficiaryKind ??
+            (item.client ? "CLIENT" : ""),
+          item.cashEntry?.phone ?? item.expense?.beneficiaryPhone ?? item.client?.phone ?? "",
+          item.cashEntry?.description ?? item.expense?.description ?? item.comment ?? "",
+          ["REVERSAL", "ADJUSTMENT"].includes(item.type)
+            ? ""
+            : (item.cashEntry?.method ?? (!item.reversal ? item.expense?.method : null) ?? ""),
         ]);
       } else if (type === "sales") {
         assertPermission(actor, "sales.view");

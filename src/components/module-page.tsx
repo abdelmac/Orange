@@ -29,6 +29,8 @@ import { FormKind, RecordForm } from "./record-form";
 import { RecordDetail } from "./record-detail";
 import { Dashboard } from "./dashboard";
 import { Settings } from "./settings";
+import { QuickEntry } from "./quick-entry";
+import { Daybook } from "./daybook";
 
 const formTitles: Record<FormKind, string> = {
   clients: "Nouveau client",
@@ -73,6 +75,8 @@ const initialFilters: Filters = {
   type: "",
 };
 export function ModulePage({ module }: { module: string }) {
+  if (module === "saisie") return <QuickEntry />;
+  if (module === "journal") return <Daybook />;
   if (module === "rapports") return <Dashboard report />;
   if (module === "parametres") return <Settings />;
   const config = modules[module];
@@ -94,7 +98,10 @@ function Collection({ module, config }: { module: string; config: ModuleConfig }
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [toast, setToast] = useState("");
-  const [filters, setFilters] = useState<Filters>(initialFilters),
+  const [filters, setFilters] = useState<Filters>(() => ({
+      ...initialFilters,
+      status: new URLSearchParams(queryString).get("status") || "",
+    })),
     [advanced, setAdvanced] = useState(false),
     [page, setPage] = useState(1),
     [lookups, setLookups] = useState<Record<string, Row[]>>({});

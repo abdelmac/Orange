@@ -190,7 +190,7 @@ export async function payExpense(actor: Actor, raw: unknown) {
         date,
         createdById: actor.id,
         validatedById: actor.id,
-        reference: input.reference,
+        reference: input.reference || expense.reference || undefined,
         idempotencyKey: input.idempotencyKey,
       },
     });

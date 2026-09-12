@@ -8,6 +8,8 @@ import {
   BarChart3,
   Bell,
   BriefcaseBusiness,
+  CalendarDays,
+  CirclePlus,
   ChevronDown,
   ChevronRight,
   CreditCard,
@@ -47,6 +49,20 @@ export const navigation = [
     icon: LayoutDashboard,
     permission: "",
     group: "VUE D’ENSEMBLE",
+  },
+  {
+    href: "/saisie",
+    label: "Saisie rapide",
+    icon: CirclePlus,
+    permission: "",
+    group: "",
+  },
+  {
+    href: "/journal",
+    label: "Journal quotidien",
+    icon: CalendarDays,
+    permission: "transactions.view",
+    group: "",
   },
   {
     href: "/caisse",
@@ -211,7 +227,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <p>{error || "Ouverture de votre espace…"}</p>
       </div>
     );
-  const visible = navigation.filter((item) => can(item.permission));
+  const visible = navigation.filter((item) =>
+    item.href === "/saisie"
+      ? can("expenses.create") ||
+        (session.user.role === "SALESPERSON" ? can("payments.create") : can("cash.deposit"))
+      : can(item.permission),
+  );
   const title = navigation.find((item) => item.href === pathname)?.label || "Votre espace";
   const initials = value(session.user, "name", "U")
     .split(" ")

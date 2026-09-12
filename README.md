@@ -4,6 +4,20 @@ Application française de gestion des ventes, factures, encaissements, caisses e
 
 **Application en ligne : [orange-finance.onrender.com](https://orange-finance.onrender.com).** Déployée sur Render à Francfort avec PostgreSQL et stockage privé persistant. Voir [le suivi du déploiement](DEPLOYMENT.md).
 
+## Encaisser et travailler au quotidien
+
+Depuis le tableau de bord, **Encaisser** ouvre une saisie courte : montant, nom de la personne, catégorie (client, chauffeur, commercial, employé, fournisseur ou autre), motif et caisse. Les espèces sont proposées par défaut. Le téléphone, la référence et la date se trouvent dans les détails facultatifs. Un commercial encaisse dans son portefeuille personnel et remet ensuite les fonds à la caisse. Le formulaire accepte les virgules françaises, évite les doublons lors d’une nouvelle tentative et propose immédiatement le reçu et une nouvelle saisie.
+
+**Régler une facture** conserve le parcours de paiement partiel/complet existant. Un encaissement sans facture augmente la trésorerie et les encaissements, mais ne solde aucune facture et ne crée pas de vente. Pour corriger un mouvement, utiliser son annulation dans Transactions.
+
+**Demander une dépense** permet la même saisie rapide pour un bénéficiaire. La demande attend sa validation puis son paiement dans Dépenses ; elle ne débite pas immédiatement la caisse. Le reçu n’est disponible qu’après paiement. Les caissiers retrouvent les dépenses validées à payer dans ce module.
+
+**Journal quotidien** regroupe les mouvements du jour avec recherche par personne, téléphone, motif, numéro, référence ou montant. Les journées correspondent au fuseau de l’appareil ; les totaux couvrent tous les résultats filtrés, même sur plusieurs pages. Les transferts internes n’augmentent pas le net de l’entreprise. Les commerciaux et caissiers voient les mouvements et totaux de leurs portefeuilles ou caisses autorisés.
+
+Les reçus PDF privés sont téléchargeables et imprimables depuis le succès d’un encaissement, le journal et les fiches transaction/paiement/dépense payée. Le numéro et les informations sont figés lors de la première émission, distincte de la date du mouvement. Toute annulation ultérieure est signalée lors d’un nouveau téléchargement. Un PDF déjà remis ne peut pas être rappelé : transmettre l’avis d’annulation et vérifier l’état actuel dans Orange. Ce reçu d’enregistrement ne remplace ni une facture ni une signature du bénéficiaire. Aucun numéro de téléphone, compte du bénéficiaire ou envoi SMS n’est obligatoire.
+
+Utilisation sur téléphone, tablette et PC, avec une connexion Internet pour enregistrer les opérations. Les liens de justificatifs ouvrent la fiche privée pour prendre une photo ou joindre un fichier. La préparation d’une future connexion ERP est décrite dans [le contrat d’export comptable](docs/ACCOUNTING_INTEGRATION.md).
+
 ## Démarrage rapide avec Docker
 
 Prérequis : Docker Desktop démarré (ou Docker Engine + Compose), Node.js 24 pour générer le fichier d’environnement. Les ports 3000 et 5434 doivent être libres.
@@ -190,9 +204,13 @@ npm run typecheck
 npm run lint
 npm test
 npm run test:integration
+npm run test:quick-entries
+npm run test:receipts
 # Avec l’application déjà démarrée :
 npm run test:http
 npm run test:browser
+# Parcours de saisie rapide (définir E2E_BASE_URL si différent de http://localhost:3100) :
+npm run test:quick-browser
 npm run build
 npm audit
 ```

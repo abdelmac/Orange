@@ -16,6 +16,19 @@ Le dépôt est vide. Construire un MVP réellement connecté à PostgreSQL et v�
 
 ## Phases
 
+### Évolution — saisie quotidienne et reçus (12 septembre 2026)
+
+- [x] Saisie rapide d’un encaissement sans facture : montant, personne et motif ; téléphone facultatif, caisse ou portefeuille autorisé, aucune vente artificielle.
+- [x] Demande de sortie rapide avec bénéficiaire (chauffeur, commercial, client, employé, fournisseur ou autre), puis validation et paiement selon les droits existants.
+- [x] Reçus privés numérotés et imprimables : instantané immuable à la première émission, historique et mention visible après annulation.
+- [x] Journal quotidien sur téléphone, tablette et PC : recherche, journées locales, totaux calculés sur tout le résultat et détail des mouvements.
+- [x] Contrat d’export JSON versionné pour préparer une future connexion ERP, avec identifiants stables et annulations ; aucun connecteur externe encore configuré.
+- [x] Tests PostgreSQL, permissions, reçus et parcours navigateur ; compilation finale avant publication.
+
+Décisions : une connexion Internet reste nécessaire pour enregistrer les mouvements. Le téléphone peut servir d’appareil de saisie ; aucun numéro de téléphone n’est obligatoire. Un reçu atteste l’enregistrement d’un mouvement et ne remplace ni une facture ni une signature. Les sorties rapides restent des demandes jusqu’à leur validation et paiement. Le journal distingue les flux externes des transferts internes pour éviter de doubler la trésorerie.
+
+Validation du 12 septembre : 29 tests unitaires (dont six contrôles PDF), 26 contrôles PostgreSQL du cycle initial, 18 contrôles PostgreSQL saisie/journal/export, 15 contrôles PostgreSQL reçus, 25 contrôles HTTP du cycle initial et neuf contrôles navigateur du nouveau parcours en 390/768/1440 px. Les tests couvrent les tentatives concurrentes, les annulations, les reçus privés figés, les droits des employés et commerciaux, le téléphone facultatif, la saisie avec virgule et les journées du fuseau Europe/Paris. Les opérations de test sont créées uniquement dans des entreprises isolées de la base locale. Le contrôle du mode historique d’une dépense payée à nouveau et du statut d’un encaissement rejoué après annulation est inclus.
+
 ### 1 — Fondations
 
 - [x] Configuration Next.js/TypeScript/lint, dépendances verrouillées.

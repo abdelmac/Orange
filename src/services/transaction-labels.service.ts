@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import type { Actor } from "@/lib/finance-context";
+import type { Prisma } from "@prisma/client";
 
 type Movement = {
   sourceCashAccountId: string | null;
@@ -8,9 +9,16 @@ type Movement = {
   destinationSalespersonId: string | null;
   client?: { name: string } | null;
   supplier?: { name: string } | null;
+  cashEntry?: { partyName: string } | null;
+  expense?: { beneficiaryName?: string | null } | null;
+  reversalOf?: { cashEntry?: { partyName: string } | null } | null;
 };
 
-export async function withTransactionLabels<T extends Movement>(actor: Actor, items: T[]) {
+export async function withTransactionLabels<T extends Movement>(
+  actor: Actor,
+  items: T[],
+  database: Prisma.TransactionClient = db,
+) {
   const cashIds = [
     ...new Set(
       items
@@ -26,11 +34,11 @@ export async function withTransactionLabels<T extends Movement>(actor: Actor, it
     ),
   ];
   const [accounts, people] = await Promise.all([
-    db.cashAccount.findMany({
+    database.cashAccount.findMany({
       where: { companyId: actor.companyId, id: { in: cashIds } },
       select: { id: true, name: true },
     }),
-    db.user.findMany({
+    database.user.findMany({
       where: { companyId: actor.companyId, id: { in: personIds } },
       select: { id: true, name: true },
     }),
@@ -51,11 +59,17 @@ export async function withTransactionLabels<T extends Movement>(actor: Actor, it
       sourceLabel:
         sourceCashAccount?.name ??
         sourceSalesperson?.name ??
+        (item.destinationCashAccountId || item.destinationSalespersonId
+          ? item.cashEntry?.partyName
+          : null) ??
+        item.expense?.beneficiaryName ??
         item.client?.name ??
         "Origine externe",
       destinationLabel:
         destinationCashAccount?.name ??
         destinationSalesperson?.name ??
+        item.reversalOf?.cashEntry?.partyName ??
+        item.expense?.beneficiaryName ??
         item.supplier?.name ??
         item.client?.name ??
         "Destination externe",

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Download, FileText, Paperclip, Upload } from "lucide-react";
+import { Download, FileText, Paperclip, Printer, Upload } from "lucide-react";
 import { date, money, related, Row, rows, value, invoiceStatus } from "@/lib/format";
 import { api } from "./api";
 import { useSession } from "./app-shell";
@@ -86,6 +86,15 @@ export function RecordDetail({ record, config }: { record: Row; config: ModuleCo
   const details = Object.entries(fields).filter(
     ([key]) => data[key] !== undefined && data[key] !== null && data[key] !== "",
   );
+  const receiptEntity =
+    config.endpoint === "transactions" && data.type !== "REVERSAL"
+      ? "transaction"
+      : config.endpoint === "payments"
+        ? "payment"
+        : config.endpoint === "expenses" && data.status === "PAID"
+          ? "expense"
+          : null;
+  const receiptUrl = receiptEntity ? `/api/receipts?entity=${receiptEntity}&id=${id}` : null;
   const relatedLists = [
     ["sales", "Ventes"],
     ["invoices", "Factures"],
@@ -117,6 +126,26 @@ export function RecordDetail({ record, config }: { record: Row; config: ModuleCo
           </strong>
         )}
       </div>
+      {receiptUrl && (
+        <div className="record-receipt-actions">
+          <a className="button secondary" href={receiptUrl}>
+            <Download size={16} />
+            Télécharger le reçu
+          </a>
+          <a
+            className="button secondary"
+            href={`${receiptUrl}&inline=1`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Printer size={16} />
+            Imprimer le reçu
+          </a>
+          {(Boolean(data.reversal) || data.status === "REVERSED") && (
+            <span className="text-red">Ce reçu porte la mention « Annulé ».</span>
+          )}
+        </div>
+      )}
       {config.endpoint === "invoices" && (
         <div className="invoice-summary">
           <div>
