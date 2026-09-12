@@ -23,7 +23,7 @@ Le dépôt est vide. Construire un MVP réellement connecté à PostgreSQL et v�
 - [x] Reçus privés numérotés et imprimables : instantané immuable à la première émission, historique et mention visible après annulation.
 - [x] Journal quotidien sur téléphone, tablette et PC : recherche, journées locales, totaux calculés sur tout le résultat et détail des mouvements.
 - [x] Contrat d’export JSON versionné pour préparer une future connexion ERP, avec identifiants stables et annulations ; aucun connecteur externe encore configuré.
-- [x] Tests PostgreSQL, permissions, reçus et parcours navigateur ; compilation finale avant publication.
+- [x] Tests PostgreSQL, permissions, reçus, parcours navigateur et compilation finale réussis ; version publiée sur le service Render existant le 12 septembre.
 
 Décisions : une connexion Internet reste nécessaire pour enregistrer les mouvements. Le téléphone peut servir d’appareil de saisie ; aucun numéro de téléphone n’est obligatoire. Un reçu atteste l’enregistrement d’un mouvement et ne remplace ni une facture ni une signature. Les sorties rapides restent des demandes jusqu’à leur validation et paiement. Le journal distingue les flux externes des transferts internes pour éviter de doubler la trésorerie.
 

@@ -2,13 +2,23 @@
 
 Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orange à Francfort avec PostgreSQL 17 et un disque privé pour les justificatifs. Le déploiement local Docker reste disponible.
 
-## Déploiement actif — 11 septembre 2026
+## Mise à jour active — 12 septembre 2026
+
+Version applicative `4eb7a0e0210642d314223aa711032a7e8b46724a`, publiée sur le service existant à 16:42 UTC (18:42 à Paris). Déploiement Render `dep-daio0m0jo6nc73fmf9pg`, état `live`. La migration additive `20260912120000_quick_entries_receipts` a été appliquée avec succès ; l’entreprise existante et son registre sont conservés.
+
+Nouveautés : `/saisie` pour les encaissements sans facture et les demandes de dépenses par bénéficiaire ; `/journal` pour le suivi quotidien ; reçus PDF privés numérotés et imprimables ; export JSON versionné pour une future connexion ERP. Le téléphone est facultatif. Les sorties restent soumises à validation et paiement. Voir [le fonctionnement quotidien](README.md#encaisser-et-travailler-au-quotidien) et [le contrat ERP](docs/ACCOUNTING_INTEGRATION.md).
+
+Validation locale : 29 tests unitaires, 59 contrôles PostgreSQL (26 initiaux, 18 saisie/journal/export, 15 reçus), 25 contrôles HTTP et neuf contrôles navigateur, avec nouveau passage de ces neuf contrôles sur le serveur standalone de production. Lint, formatage, TypeScript et build réussis. Les tests financiers ont utilisé exclusivement des entreprises de vérification locales.
+
+Vérifications après publication réussies : connexion administrateur, PostgreSQL, nouveaux endpoints privés sans session, saisie rapide avec téléphone facultatif, journal connecté au schéma migré, vues mobile/PC sans erreur JavaScript. Aucune opération financière de test n’a été créée en production. Rapport local exclu de Git : `.local/production-quick-verification.json` ; captures `.local/production-quick-mobile.png` et `.local/production-journal-*.png`.
+
+## Installation initiale — 11 septembre 2026
 
 - Application : **https://orange-finance.onrender.com**.
 - [Service Render existant](https://dashboard.render.com/web/srv-dai090bm8hqs73dkpgk0).
 - [Base PostgreSQL existante](https://dashboard.render.com/d/dpg-dai023ijnfac73acjtpg-a), accès réseau privé uniquement.
 - Région : Francfort ; disque privé monté sur `/var/data`, capacité 1 Go.
-- Version applicative déployée : `f38f8b1777493bb348a2154e60a7fc5ef1a8da06` ; migrations appliquées avec succès.
+- Version initiale : `f38f8b1777493bb348a2154e60a7fc5ef1a8da06` ; remplacée par la mise à jour décrite ci-dessus.
 - Entreprise initialisée : **Orange**, une caisse vide et un administrateur utilisant l’adresse du compte Render authentifié. Les données locales de démonstration et de test n’ont pas été importées.
 
 Les ressources ont été créées via l’API Render avec la configuration de `render.yaml`. Pour mettre cette installation à jour, redéployer le service existant ; ne pas recréer la base ni relancer l’initialisation de l’entreprise.
