@@ -73,7 +73,14 @@ final class AppCoordinator: NSObject, WKHTTPCookieStoreObserver, UITabBarControl
         guard sessionCookie != nil, !home.webView.isLoading else { return }
         Task { let _: SessionContext? = try? await bridge.request("/api/me") }
     }
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) { verifySession() }
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        // A native write does not invalidate React state in the sibling WebViews.
+        // In particular, checking the journal after an uncertain response must fetch
+        // the current ledger, not display the page loaded before the attempted write.
+        if tabBarController.selectedIndex == 0 { home.load(path: "/") }
+        if tabBarController.selectedIndex == 2 { journal.load(path: "/journal") }
+        verifySession()
+    }
 
     private func resetPrivateViews() {
         tabs.dismiss(animated: false)
