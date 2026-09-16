@@ -1,0 +1,119 @@
+name: Mobile builds
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile.yml"
+  pull_request:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android — tests, APK, AAB
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: mobile/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Verify Gradle wrapper
+        run: echo '81a82aaea5abcc8ff68b3dfcb58b3c3c429378efd98e7433460610fecd7ae45f  gradle/wrapper/gradle-wrapper.jar' | sha256sum -c -
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install Android SDK platform
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Test and build
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug bundleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-development-apk-and-unsigned-aab
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            mobile/android/app/build/outputs/apk/debug/*.apk
+            mobile/android/app/build/outputs/bundle/release/*.aab
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-test-reports
+          retention-days: 14
+          path: mobile/android/app/build/reports/
+
+  ios:
+    name: iOS — tests and simulator build
+    runs-on: macos-26
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Xcode and install project generator
+        run: |
+          xcodebuild -version
+          test "$(xcodebuild -version | head -1 | cut -d' ' -f2 | cut -d. -f1)" -ge 26
+          command -v xcodegen >/dev/null || brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build simulator application
+        run: >-
+          xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinance
+          -sdk iphonesimulator -configuration Debug -derivedDataPath DerivedData
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Run unit tests on an available iPhone
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for runtime,items in d["devices"].items() if "iOS" in runtime for x in items if "iPhone" in x["name"]))')
+          echo "IOS_SIMULATOR_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+          xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinanceTests \
+            -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+            -derivedDataPath DerivedData -resultBundlePath build/UnitTests.xcresult \
+            CODE_SIGNING_ALLOWED=NO test
+      - name: Capture native application launch
+        run: |
+          xcrun simctl bootstatus "$IOS_SIMULATOR_ID" -b
+          xcrun simctl ui "$IOS_SIMULATOR_ID" appearance light
+          xcrun simctl install "$IOS_SIMULATOR_ID" DerivedData/Build/Products/Debug-iphonesimulator/OrangeFinance.app
+          xcrun simctl launch "$IOS_SIMULATOR_ID" com.ennearock.orangefinance
+          sleep 8
+          mkdir -p build
+          xcrun simctl io "$IOS_SIMULATOR_ID" screenshot build/ios-launch.png
+      - name: Verify device build without distribution signing
+        run: >-
+          xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinance
+          -sdk iphoneos -configuration Release -derivedDataPath DerivedData
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Package simulator application
+        run: ditto -c -k --sequesterRsrc --keepParent DerivedData/Build/Products/Debug-iphonesimulator/OrangeFinance.app build/OrangeFinance-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-app-not-for-app-store
+          retention-days: 14
+          if-no-files-found: error
+          path: mobile/ios/build/OrangeFinance-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-launch-screenshot
+          retention-days: 14
+          path: mobile/ios/build/ios-launch.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-test-reports
+          retention-days: 14
+          path: mobile/ios/build/UnitTests.xcresult

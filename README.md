@@ -6,6 +6,8 @@ Application française de gestion des ventes, factures, encaissements, caisses e
 
 ## Encaisser et travailler au quotidien
 
+Les projets [Android et iOS](mobile/README.md) ajoutent une saisie native des encaissements et le partage des justificatifs. Le [dossier de publication](docs/mobile/STORES.md) décrit les builds, comptes, signatures et validations à terminer avant leur disponibilité en boutique. La PWA en ligne reste installable depuis le navigateur.
+
 Depuis le tableau de bord, **Encaisser** ouvre une saisie courte : montant, nom de la personne, catégorie (client, chauffeur, commercial, employé, fournisseur ou autre), motif et caisse. Les espèces sont proposées par défaut. Le téléphone, la référence et la date se trouvent dans les détails facultatifs. Un commercial encaisse dans son portefeuille personnel et remet ensuite les fonds à la caisse. Le formulaire accepte les virgules françaises, évite les doublons lors d’une nouvelle tentative et propose immédiatement le reçu et une nouvelle saisie.
 
 **Régler une facture** conserve le parcours de paiement partiel/complet existant. Un encaissement sans facture augmente la trésorerie et les encaissements, mais ne solde aucune facture et ne crée pas de vente. Pour corriger un mouvement, utiliser son annulation dans Transactions.

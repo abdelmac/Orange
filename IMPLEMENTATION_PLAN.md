@@ -2,6 +2,20 @@
 
 ## Objectif et état initial
 
+## Extension boutiques mobiles — 16 septembre 2026
+
+La demande de publication ajoute deux clients natifs au MVP web existant. L’utilisateur confirme ne pas encore avoir de compte Apple Developer ni Google Play Console ; le contact des boutiques est `ennearock@gmail.com`.
+
+1. Ajouter les clients Kotlin/Android et Swift/UIKit avec navigation, saisie d’encaissement, capture des justificatifs et partage des reçus. Réutiliser les API financières, l’authentification et les permissions existantes.
+2. Restreindre la navigation et les téléchargements à l’origine HTTPS autorisée, préserver l’idempotence et interdire les écritures hors ligne. Tester les montants et les politiques d’URL.
+3. Compiler Android (APK d’essai et AAB non signé) et iOS (simulateur et compilation device sans signature) dans GitHub Actions ; corriger les erreurs constatées. Vérifier que le web continue de compiler et de passer ses tests.
+4. Préparer les icônes, pages publiques d’assistance/confidentialité, fiches françaises et instructions de signature. Documenter la recette sur appareils et les obligations de suppression des comptes selon les parcours retenus.
+5. Après inscription de l’éditeur et confirmation de son identité/distribution : configurer signatures, environnement de revue et captures réelles, effectuer les tests requis puis soumettre aux boutiques. Cette étape dépend des comptes de l’utilisateur et de l’acceptation des boutiques ; aucune publication ne peut être déclarée avant celle-ci.
+
+Les résultats de compilation et limites de distribution sont consignés dans [mobile/README.md](mobile/README.md) et [docs/mobile/STORES.md](docs/mobile/STORES.md).
+
+## État au démarrage du MVP web
+
 Le dépôt est vide. Construire un MVP réellement connecté à PostgreSQL et vérifier le scénario métier demandé, depuis la création d’un commercial jusqu’au paiement d’une dépense. Aucune donnée de démonstration ne sera utilisée comme remplacement silencieux d’une base indisponible.
 
 ## Architecture retenue

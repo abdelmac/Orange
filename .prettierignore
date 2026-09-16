@@ -7,3 +7,10 @@ uploads
 *.tsbuildinfo
 AGENTS.md
 CLAUDE.md
+mobile/android/.gradle
+mobile/android/.kotlin
+mobile/android/**/build
+mobile/ios/DerivedData
+mobile/ios/build
+mobile/ios/*.xcodeproj
+mobile/ios/*.xcworkspace

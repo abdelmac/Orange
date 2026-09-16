@@ -1,0 +1,76 @@
+{
+  "status": "draft_not_for_automatic_submission",
+  "reviewed_at": "2026-09-16",
+  "locale": "fr-FR",
+  "publisher": {
+    "legal_name": null,
+    "legal_address": null,
+    "legal_phone": null,
+    "support_email": "ennearock@gmail.com",
+    "support_email_confirmed": true,
+    "support_url": "https://orange-finance.onrender.com/assistance",
+    "privacy_policy_url": "https://orange-finance.onrender.com/confidentialite",
+    "public_pages_status": "pending_deployment_and_publisher_completion",
+    "account_deletion_url": null,
+    "copyright": null,
+    "apple_developer_account_available": false,
+    "google_play_account_available": false
+  },
+  "application": {
+    "name": "Orange Finance",
+    "name_confirmed": false,
+    "bundle_id_candidate": "com.ennearock.orangefinance",
+    "bundle_id_confirmed": false,
+    "service_origin": "https://orange-finance.onrender.com",
+    "distribution_candidate": "public_with_organization_login",
+    "distribution_confirmed": false,
+    "price_candidate": "free_download_existing_business_account_required",
+    "price_confirmed": false,
+    "category_candidate": "BUSINESS",
+    "account_model": "administrator_provisioned_no_public_self_registration",
+    "ads": false,
+    "analytics_sdk": false,
+    "processes_bank_or_card_payments": false,
+    "financial_writes_require_network": true
+  },
+  "apple": {
+    "name": "Orange Finance",
+    "subtitle": "Caisse, dépenses et reçus",
+    "keywords": "caisse,dépenses,encaissements,reçus,factures,entreprise,commercial,journal",
+    "promotional_text": "Retrouvez les encaissements, dépenses, justificatifs et reçus de votre entreprise dans une interface conçue pour le travail quotidien.",
+    "minimum_submission_xcode": 26,
+    "minimum_submission_sdk": 26,
+    "team_id": null,
+    "app_store_connect_id": null,
+    "age_rating": null
+  },
+  "google_play": {
+    "title": "Orange Finance",
+    "short_description": "Suivez encaissements, dépenses et caisses avec votre équipe.",
+    "target_sdk_minimum": 36,
+    "package_name_confirmed": false,
+    "developer_account_id": null,
+    "content_rating": null,
+    "financial_features_declaration": null,
+    "data_safety_declaration": null
+  },
+  "full_description": "Orange Finance accompagne les équipes dans le suivi quotidien de l’argent de leur entreprise. Un compte professionnel fourni par votre administrateur est nécessaire.\n\nEnregistrez un encaissement avec ou sans facture, retrouvez les opérations dans le journal quotidien et consultez les montants disponibles dans vos caisses ou votre portefeuille commercial. Le nom de la personne et le motif identifient chaque saisie ; le téléphone reste facultatif.\n\nCréez des demandes de dépenses, ajoutez un justificatif et suivez leur validation puis leur paiement. Les accès dépendent des autorisations attribuées par l’entreprise : administrateur, responsable, comptable, caissier, commercial ou employé.\n\nRetrouvez vos clients, ventes, factures et paiements partiels. Téléchargez les reçus PDF et consultez l’historique des mouvements. Les corrections financières conservent la trace de l’opération initiale et de son annulation.\n\nUne connexion Internet est nécessaire. Orange Finance enregistre les opérations déclarées par votre entreprise ; l’application n’exécute pas de virements bancaires et ne traite pas les paiements par carte. Les fonctionnalités visibles varient selon votre rôle.\n\nAssistance : ennearock@gmail.com.",
+  "review_access": {
+    "status": "dedicated_hosted_demo_company_required",
+    "credentials_location": "store_console_private_review_fields_only",
+    "credentials_in_repository": false,
+    "native_features_validation": "pending_device_recipe",
+    "account_deletion_scope_review": "required_for_final_native_and_webview_flows"
+  },
+  "publication_blockers": [
+    "publisher_legal_identity",
+    "developer_accounts_and_verification",
+    "final_name_identifier_and_distribution",
+    "release_signing",
+    "public_support_and_privacy_urls",
+    "final_privacy_retention_and_deletion_declarations",
+    "native_device_recipe_and_real_screenshots",
+    "hosted_review_access",
+    "required_store_testing_and_review"
+  ]
+}

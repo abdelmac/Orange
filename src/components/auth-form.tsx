@@ -192,6 +192,24 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
           <div className="auth-security">
             <ShieldCheck size={15} /> Connexion sécurisée · Accès réservé à votre équipe
           </div>
+          <nav
+            aria-label="Aide et confidentialité"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 18,
+              marginTop: 8,
+              fontSize: 12,
+              color: "#737b85",
+            }}
+          >
+            <Link href="/assistance" style={{ paddingBlock: 12 }}>
+              Assistance
+            </Link>
+            <Link href="/confidentialite" style={{ paddingBlock: 12 }}>
+              Confidentialité
+            </Link>
+          </nav>
         </div>
         <div className="auth-copyright">
           Orange © {new Date().getFullYear()} · La clarté fait la différence.

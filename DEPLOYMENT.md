@@ -88,6 +88,8 @@ Les suites complètes `test:http`, `test:browser` et `test:integration` créent 
 
 ## Exploitation
 
+Les versions mobiles Android/iOS sont préparées dans [mobile](mobile/README.md). Leur compilation est indépendante du déploiement Render : les applications utilisent les API HTTPS existantes. Voir le [dossier App Store / Google Play](docs/mobile/STORES.md) pour les inscriptions, signatures, essais et soumissions. Un APK d’essai, un AAB non signé ou une application de simulateur ne signifie pas que l’application est publiée.
+
 Les migrations s’exécutent avant chaque déploiement avec `npm run db:migrate`. Le déploiement automatique est désactivé : déclencher un déploiement manuel après validation d’un commit. En cas d’échec d’une migration, corriger sa cause avant de redéployer ; ne pas remplacer les migrations par `prisma db push`.
 
 Configurer les variables `SMTP_*` du README pour activer les emails de récupération de compte. Configurer les sauvegardes et vérifier une restauration de PostgreSQL avec celle des justificatifs. Surveiller l’occupation des deux volumes et la mémoire avant d’augmenter les ressources.

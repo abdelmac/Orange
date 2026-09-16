@@ -1,0 +1,7 @@
+OrangeFinance.xcodeproj/
+build/
+DerivedData/
+*.xcarchive
+*.ipa
+*.xcresult
+xcuserdata/
