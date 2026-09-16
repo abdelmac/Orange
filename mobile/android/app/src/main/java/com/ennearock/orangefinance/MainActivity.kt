@@ -108,6 +108,18 @@ class MainActivity : AppCompatActivity() {
                 ready = true; progress.visibility = View.GONE
                 CookieManager.getInstance().flush()
                 checkSessionChange()
+                // The native bottom navigation replaces the web mobile bar.
+                // This style exists only inside this WebView, never on the server.
+                view.evaluateJavascript("""
+                    (() => {
+                      if (location.origin !== ${JSONObject.quote(AppPolicy.ORIGIN)}) return;
+                      if (document.getElementById('orange-native-navigation')) return;
+                      const style = document.createElement('style');
+                      style.id = 'orange-native-navigation';
+                      style.textContent = '.mobile-bottom-nav { display: none !important; }';
+                      document.head.appendChild(style);
+                    })();
+                """.trimIndent(), null)
                 if (Uri.parse(url).path != "/login") lastPage = Uri.parse(url).encodedPath.orEmpty() + (Uri.parse(url).encodedQuery?.let { "?$it" } ?: "")
             }
             override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {
@@ -136,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         }
         webView.setDownloadListener { url, _, _, _, _ -> shareDocument(url) }
         navButton("Accueil") { navigate("/") }
-        navButton("Saisie") { showQuickEntry() }
+        navButton("Encaisser") { showQuickEntry() }
         navButton("Journal") { navigate("/journal") }
         navButton("Plus") { showMore() }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -161,7 +173,7 @@ class MainActivity : AppCompatActivity() {
     private fun showQuickEntry() {
         checkSessionChange()
         if (entry.submitting) { message("Un encaissement est déjà en cours."); return }
-        if (!ready) { message("Attendez la fin du chargement, puis ouvrez Saisie."); return }
+        if (!ready) { message("Attendez la fin du chargement, puis appuyez sur Encaisser."); return }
         if (Uri.parse(webView.url).path == "/login") { message("Connectez-vous avant d’encaisser."); return }
         hideQuick()
         quick = QuickEntryPanel(this, entry, bridge, ::connected, ::login, ::navigate, ::shareDocument)

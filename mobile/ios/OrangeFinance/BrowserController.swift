@@ -6,7 +6,6 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
     private(set) var webView: WKWebView
     var onLogin: (() -> Void)?
     var onPDF: ((URL, UIViewController) -> Void)?
-    private let initialPath: String
     private var lastPath: String
     private let offline = UIStackView()
     private let message = UILabel()
@@ -15,15 +14,31 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
     private var notifyLogin = true
 
     init(title: String, path: String, store: WKWebsiteDataStore) {
-        initialPath = path; lastPath = path
-        let config = WKWebViewConfiguration()
-        config.websiteDataStore = store
-        config.preferences.javaScriptCanOpenWindowsAutomatically = false
+        lastPath = path
+        let config = Self.configuration(store: store)
         webView = WKWebView(frame: .zero, configuration: config)
         super.init(nibName: nil, bundle: nil)
         self.title = title
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) is unavailable") }
+
+    private static func configuration(store: WKWebsiteDataStore) -> WKWebViewConfiguration {
+        let config = WKWebViewConfiguration()
+        config.websiteDataStore = store
+        config.preferences.javaScriptCanOpenWindowsAutomatically = false
+        // Presentation only: the native tab bar replaces this existing mobile navigation.
+        // No session, form, or authorization data is read by this script.
+        let style = """
+        (() => {
+          if (window.location.origin !== 'https://orange-finance.onrender.com') return;
+          const style = document.createElement('style');
+          style.textContent = '.mobile-bottom-nav { display: none !important; }';
+          document.head.appendChild(style);
+        })();
+        """
+        config.userContentController.addUserScript(WKUserScript(source: style, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        return config
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +65,7 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
         webView.translatesAutoresizingMaskIntoConstraints = false
         urlObservation = webView.observe(\.url, options: [.new]) { [weak self] webView, _ in
             Task { @MainActor in
-                guard let self, self.notifyLogin, webView.url?.path == "/login" else { return }
+                guard let self, self.webView === webView, self.notifyLogin, webView.url?.path == "/login" else { return }
                 self.onLogin?()
             }
         }
@@ -74,9 +89,7 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
     func resetToLogin() {
         webView.stopLoading()
         // A fresh WKWebView drops all in-memory pages and back/forward snapshots from the previous user.
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = webView.configuration.websiteDataStore
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
+        let configuration = Self.configuration(store: webView.configuration.websiteDataStore)
         webView.navigationDelegate = nil; webView.uiDelegate = nil; webView.removeFromSuperview()
         urlObservation = nil
         webView = WKWebView(frame: .zero, configuration: configuration)
@@ -123,6 +136,7 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard self.webView === webView else { return }
         spinner.stopAnimating(); offline.isHidden = true; webView.isHidden = false
         if notifyLogin, webView.url?.path == "/login" { onLogin?() }
     }

@@ -2,7 +2,7 @@
 
 Application native Kotlin pour Android 8 et versions suivantes, identifiant `com.ennearock.orangefinance`, version `1.0.0` (code `1`). L’application se connecte exclusivement à `https://orange-finance.onrender.com`.
 
-La navigation Accueil / Saisie / Journal / Plus est native. Saisie contient un véritable formulaire Android d’encaissement : montant exact, tiers, motif, mode, caisse autorisée ou portefeuille personnel du commercial, téléphone facultatif. Les autres modules restent accessibles avec leur interface web responsive et leurs permissions serveur. Les PDF et justificatifs peuvent être ouverts ou partagés avec une autre application sur demande ; le sélecteur système permet de joindre une image, un PDF ou une photo prise avec l’application photo du téléphone.
+La navigation Accueil / Encaisser / Journal / Plus est native. Encaisser contient un véritable formulaire Android d’encaissement : montant exact, tiers, motif, mode, caisse autorisée ou portefeuille personnel du commercial, téléphone facultatif. Les autres modules restent accessibles avec leur interface web responsive et leurs permissions serveur. Les PDF et justificatifs peuvent être ouverts ou partagés avec une autre application sur demande ; le sélecteur système permet de joindre une image, un PDF ou une photo prise avec l’application photo du téléphone.
 
 ## Compiler
 
@@ -55,7 +55,7 @@ Les tests JUnit couvrent l’origine exacte, les hôtes ressemblants, les schém
 
 Sur un appareil ou émulateur Android 8 puis Android 16, avec une **entreprise de test explicitement autorisée** :
 
-1. Se connecter ; ouvrir Saisie, créer un encaissement `4 000,25`, vérifier le journal et partager le PDF.
+1. Se connecter ; ouvrir Encaisser, créer un encaissement `4 000,25`, vérifier le journal et partager le PDF.
 2. Vérifier un commercial (portefeuille personnel) et un caissier (caisses affectées), puis un employé sans permission d’encaisser.
 3. Couper le réseau avant la validation : aucune opération ne doit apparaître. Simuler une interruption après l’envoi, puis réessayer : une seule opération doit exister.
 4. Joindre une photo et un PDF à une dépense ; refuser un fichier trop volumineux ou d’un type non admis.
