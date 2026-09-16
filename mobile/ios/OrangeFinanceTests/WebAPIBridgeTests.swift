@@ -13,7 +13,8 @@ final class WebAPIBridgeTests: XCTestCase {
     }
     func testUnloadedPageCannotReceiveFinancialWrite() async {
         let bridge = WebAPIBridge()
-        bridge.webView = WKWebView(frame: .zero)
+        let page = WKWebView(frame: .zero)
+        bridge.webView = page
         do {
             let _: EmptyResult = try await bridge.request("/api/quick-entries", method: "POST", body: ["amount": "10.00"])
             XCTFail("Unloaded page accepted")

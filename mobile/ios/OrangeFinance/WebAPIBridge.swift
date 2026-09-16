@@ -41,6 +41,9 @@ final class WebAPIBridge {
                 arguments: ["path": path, "method": method, "body": body.map { $0 as Any } ?? NSNull(), "expectedOrigin": OriginPolicy.origin],
                 in: nil, contentWorld: .page)
         } catch { throw APIError.unavailable }
+        // A response from a destroyed page belongs to an earlier session. In particular,
+        // its late 401 must never sign out a user who has since connected in a new WebView.
+        guard self.webView === webView, OriginPolicy.isTrusted(webView.url) else { throw APIError.unavailable }
         guard let result = value as? [String: Any], let status = result["status"] as? Int, let data = result["data"] else { throw APIError.invalidResponse }
         if status == 401 { sessionExpired?(); throw APIError.sessionExpired }
         guard (200..<300).contains(status) else {

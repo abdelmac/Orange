@@ -33,9 +33,9 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
         message.numberOfLines = 0; message.textAlignment = .center
         message.font = .preferredFont(forTextStyle: .body); message.adjustsFontForContentSizeCategory = true
         var config = UIButton.Configuration.filled(); config.title = "Réessayer"
-        let retry = UIButton(configuration: config, primaryAction: UIAction { [weak self] _ in self?.retry() })
+        let retryButton = UIButton(configuration: config, primaryAction: UIAction { [weak self] _ in self?.retry() })
         offline.axis = .vertical; offline.spacing = 20; offline.alignment = .fill
-        offline.addArrangedSubview(message); offline.addArrangedSubview(retry)
+        offline.addArrangedSubview(message); offline.addArrangedSubview(retryButton)
         offline.translatesAutoresizingMaskIntoConstraints = false; view.addSubview(offline)
         NSLayoutConstraint.activate([offline.centerYAnchor.constraint(equalTo: view.centerYAnchor), offline.centerXAnchor.constraint(equalTo: view.centerXAnchor), offline.widthAnchor.constraint(lessThanOrEqualToConstant: 440), offline.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 28), offline.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -28)])
         offline.isHidden = true
