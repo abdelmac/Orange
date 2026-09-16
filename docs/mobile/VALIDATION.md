@@ -4,14 +4,17 @@
 
 ## Vérifications exécutées
 
-| Vérification    | Résultat constaté                                                                                                                                                                                                                                         |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Application web | TypeScript, ESLint, 29 tests unitaires et build de production réussis                                                                                                                                                                                     |
-| Pages publiques | Assistance, confidentialité et connexion contrôlées à 390, 768 et 1440 px ; liens fonctionnels, aucun débordement horizontal ni erreur JavaScript                                                                                                         |
-| Android         | Compilation debug/release, six tests JUnit, lint, APK de développement et AAB release réussis dans le job [104931754629](https://github.com/abdelmac/Orange/actions/runs/35136942069/job/104931754629), source `a319e1a8c5651c432c49b5c5e053df1a3e2275b4` |
-| iOS simulateur  | Compilation, installation, lancement et neuf tests XCTest réussis dans le job [104934055998](https://github.com/abdelmac/Orange/actions/runs/35137633799/job/104934055998), source `4e801c5edc6dc48577f004b0ab45c2b955471db1`                             |
-| iOS appareil    | Configuration Release compilée avec le SDK iphoneos dans le même job ; signature de distribution non configurée                                                                                                                                           |
-| Revue native    | Origine HTTPS exacte, appels API limités, calculs textuels/décimaux, reprise idempotente, purge des sessions, téléchargements privés bornés et sans redirection examinés                                                                                  |
+Le [workflow final est réussi](https://github.com/abdelmac/Orange/actions/runs/35139516655) pour la source `e4fdb113765d6a78bae83d3d123d077b99b0f63c` : deux jobs verts, Android et iOS. Les commits de documentation qui suivent ne changent pas les binaires.
+
+| Vérification    | Résultat constaté                                                                                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Application web | TypeScript, ESLint, 29 tests unitaires et build de production réussis                                                                                                                                               |
+| Pages publiques | Assistance, confidentialité et connexion contrôlées à 390, 768 et 1440 px ; liens fonctionnels, aucun débordement horizontal ni erreur JavaScript                                                                   |
+| Android         | Compilation debug/release, six tests JUnit, lint, APK de développement et AAB release réussis dans le job [104940542242](https://github.com/abdelmac/Orange/actions/runs/35139516655/job/104940542242)              |
+| iOS simulateur  | Compilation, installation, lancement et neuf tests XCTest réussis dans le job [104940541888](https://github.com/abdelmac/Orange/actions/runs/35139516655/job/104940541888)                                          |
+| iOS appareil    | Configuration Release compilée avec le SDK iphoneos dans le même job ; signature de distribution non configurée                                                                                                     |
+| Connexion iOS   | Un test XCUITest réussi en 20,8 secondes : champs email/mot de passe présents et bouton de connexion actif dans WKWebView ; capture exportée et examinée visuellement. Aucun identifiant saisi ni formulaire soumis |
+| Revue native    | Origine HTTPS exacte, appels API limités, calculs textuels/décimaux, reprise idempotente, purge des sessions, téléchargements privés bornés et sans redirection examinés                                            |
 
 Les correctifs relevés pendant la revue et les premières compilations sont intégrés : reprise après rotation Android, conservation du corps d’une tentative incertaine, détection des déconnexions SPA, rejet des anciennes réponses iOS après changement d’utilisateur, téléchargement des justificatifs image et rapports PDF, compatibilité Android 8.0 et suppression du doublon de navigation web/native. Les onglets iOS Accueil et Journal rechargent les données du serveur à leur sélection après une saisie native.
 
@@ -25,7 +28,9 @@ L’APK est signé avec une **clé de développement** du runner ; l’AAB est *
 
 ## Artefact iOS disponible
 
-L’application pour simulateur du [run réussi](https://github.com/abdelmac/Orange/actions/runs/35137633799) est aussi conservée localement dans `.local/mobile-artifacts/4e801c5/ios/OrangeFinance-simulator.zip`, après vérification de la somme de l’archive GitHub. Ce fichier s’installe uniquement dans un simulateur iOS sur Mac. Il ne s’agit pas d’un IPA signé pour iPhone, TestFlight ou l’App Store. La première capture automatisée montrait encore le chargement web ; elle ne constitue pas une capture de fiche boutique.
+L’application pour simulateur du [run final réussi](https://github.com/abdelmac/Orange/actions/runs/35139516655) est aussi conservée localement dans `.local/mobile-artifacts/e4fdb11/ios/OrangeFinance-simulator.zip`, après vérification de la somme de l’archive GitHub. Ce fichier s’installe uniquement dans un simulateur iOS sur Mac. Il ne s’agit pas d’un IPA signé pour iPhone, TestFlight ou l’App Store.
+
+Le même run contient les rapports XCTest et la capture réelle de connexion dans `ios-ui-screenshots`. La copie locale est dans `.local/mobile-artifacts/e4fdb11/capture/`. La capture montre le formulaire chargé dans l’application native, sans données privées. Les visuels finaux des fiches doivent encore montrer les fonctions métier avec des données de démonstration.
 
 ## Limites de cette validation
 
