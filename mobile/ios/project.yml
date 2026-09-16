@@ -38,6 +38,17 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ennearock.orangefinance.tests
         GENERATE_INFOPLIST_FILE: YES
+  OrangeFinanceUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [OrangeFinanceUITests]
+    dependencies:
+      - target: OrangeFinance
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ennearock.orangefinance.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: OrangeFinance
 schemes:
   OrangeFinance:
     build:
@@ -52,3 +63,10 @@ schemes:
         OrangeFinanceTests: [test]
     test:
       targets: [OrangeFinanceTests]
+  OrangeFinanceUITests:
+    build:
+      targets:
+        OrangeFinance: all
+        OrangeFinanceUITests: [test]
+    test:
+      targets: [OrangeFinanceUITests]

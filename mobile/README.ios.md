@@ -50,6 +50,17 @@ Il n’existe aucune file d’écritures hors ligne ni reprise automatique. Apr�
 
 Les tests XCTest couvrent la politique d’origine, les chemins API/document, les cookies transmis, le montant sans flottants et le refus d’appels sans page de confiance. Compléter sur simulateur puis appareil réel : connexion pour chaque rôle, saisie commerciale et caissier, échec réseau après validation, reprise sans doublon, photo d’un justificatif, PDF et image, impression/partage iPad, changement d’utilisateur, expiration et retour arrière après déconnexion. Les tests de compilation CI ne prouvent pas à eux seuls ces scénarios matériels.
 
+Le schéma distinct `OrangeFinanceUITests` vérifie le chargement réel de la connexion distante dans WKWebView sur un simulateur sans session. Il attend au maximum 120 secondes les champs email/mot de passe et le bouton « Se connecter » actif, sans saisir d’identifiants ni soumettre le formulaire. Une capture est conservée dans le résultat XCTest, même en cas de succès. Ce test exige un réseau fonctionnel et le serveur disponible ; conserver une limite d’exécution XCTest supérieure au délai d’attente :
+
+```sh
+xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinanceUITests \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -resultBundlePath build/LoginUI.xcresult -parallel-testing-enabled NO \
+  -test-timeouts-enabled YES -default-test-execution-time-allowance 180 \
+  -maximum-test-execution-time-allowance 180 \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= test
+```
+
 Un compte Apple Developer, la signature, App Store Connect et la revue Apple restent nécessaires pour une distribution publique. L’acceptation en boutique n’est pas garantie par la présence des fonctions natives. Aucun IPA signé ni publication n’est annoncé par ce projet.
 
 Références Apple : [callAsyncJavaScript](<https://developer.apple.com/documentation/webkit/wkwebview/callasyncjavascript(_:arguments:in:contentworld:completionhandler:)>), [WKDownloadDelegate](https://developer.apple.com/documentation/webkit/wkdownloaddelegate), [partage système](https://developer.apple.com/documentation/uikit/uiactivityviewcontroller), [impression](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller), [caméra](https://developer.apple.com/documentation/bundleresources/information-property-list/nscamerausagedescription), [Required Reason APIs](https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api).
