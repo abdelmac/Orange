@@ -6,6 +6,8 @@ Le nom proposé est **Orange Finance**, avec l’identifiant provisoire `com.enn
 
 ## 1. Choisir la distribution
 
+Les projets et preuves de compilation sont décrits dans [VALIDATION.md](VALIDATION.md). Les [visuels fournis](assets/README.md) comprennent les icônes et la bannière Google Play ; les captures de fiche doivent être faites sur les versions réellement exécutées avec des données de démonstration.
+
 La préparation vise par défaut une fiche publique, conformément à la demande de présence sur les deux stores. La connexion reste réservée aux utilisateurs créés par leur entreprise : rendre l’application publique ne rend pas les données publiques.
 
 | Besoin                                                                    | Apple                                                                            | Android                                                                                                                           |

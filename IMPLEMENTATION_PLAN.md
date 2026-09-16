@@ -12,7 +12,7 @@ La demande de publication ajoute deux clients natifs au MVP web existant. L’ut
 4. Préparer les icônes, pages publiques d’assistance/confidentialité, fiches françaises et instructions de signature. Documenter la recette sur appareils et les obligations de suppression des comptes selon les parcours retenus.
 5. Après inscription de l’éditeur et confirmation de son identité/distribution : configurer signatures, environnement de revue et captures réelles, effectuer les tests requis puis soumettre aux boutiques. Cette étape dépend des comptes de l’utilisateur et de l’acceptation des boutiques ; aucune publication ne peut être déclarée avant celle-ci.
 
-Les résultats de compilation et limites de distribution sont consignés dans [mobile/README.md](mobile/README.md) et [docs/mobile/STORES.md](docs/mobile/STORES.md).
+Les clients Android/iOS, la saisie native, le partage des reçus, les builds CI et les pages publiques de support/confidentialité sont implémentés. Les résultats exécutés sont consignés dans [docs/mobile/VALIDATION.md](docs/mobile/VALIDATION.md), les instructions de compilation dans [mobile/README.md](mobile/README.md) et les étapes de distribution restantes dans [docs/mobile/STORES.md](docs/mobile/STORES.md).
 
 ## État au démarrage du MVP web
 

@@ -4,6 +4,14 @@ Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orang
 
 ## Mise à jour active — 12 septembre 2026
 
+### Préparation des boutiques — 16 septembre 2026
+
+Les projets Android/iOS, leurs builds et les pages publiques `/assistance` et `/confidentialite` sont ajoutés au dépôt. **Ces deux nouvelles pages ne sont pas encore déployées sur Render.** L’accès CLI utilisé précédemment a expiré le 14 septembre 2026 à 21:14 UTC ; la vérification de l’API retourne 401. Reconnecter Render, puis déployer le commit validé sur le service existant. Le travail mobile n’a modifié ni la base ni les données de production. Les applications utilisent les API déjà en ligne.
+
+Voir [la validation mobile](docs/mobile/VALIDATION.md) et [les étapes de publication](docs/mobile/STORES.md). Aucune fiche App Store ou Google Play n’est publiée : les comptes développeur, l’identité de l’éditeur, la signature et les validations de boutique restent nécessaires.
+
+### Version applicative en ligne
+
 Version applicative `4eb7a0e0210642d314223aa711032a7e8b46724a`, publiée sur le service existant à 16:42 UTC (18:42 à Paris). Déploiement Render `dep-daio0m0jo6nc73fmf9pg`, état `live`. La migration additive `20260912120000_quick_entries_receipts` a été appliquée avec succès ; l’entreprise existante et son registre sont conservés.
 
 Nouveautés : `/saisie` pour les encaissements sans facture et les demandes de dépenses par bénéficiaire ; `/journal` pour le suivi quotidien ; reçus PDF privés numérotés et imprimables ; export JSON versionné pour une future connexion ERP. Le téléphone est facultatif. Les sorties restent soumises à validation et paiement. Voir [le fonctionnement quotidien](README.md#encaisser-et-travailler-au-quotidien) et [le contrat ERP](docs/ACCOUNTING_INTEGRATION.md).
