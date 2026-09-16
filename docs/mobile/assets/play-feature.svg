@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffaf4"/><stop offset="1" stop-color="#f6e6da"/></linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ec7848"/><stop offset="1" stop-color="#b94c2a"/></linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#paper)"/>
+  <circle cx="956" cy="32" r="236" fill="#f4d3be" opacity=".5"/>
+  <circle cx="757" cy="485" r="210" fill="#f1c4a9" opacity=".3"/>
+  <g transform="translate(58 55) scale(.255)">
+    <rect width="192" height="192" rx="48" fill="#e96532"/>
+    <path d="M133 56a56 56 0 1 0 19 51h-33a24 24 0 1 1-8-30z" fill="white"/>
+    <circle cx="145" cy="49" r="14" fill="#ffd29c"/>
+  </g>
+  <text x="120" y="90" fill="#243c45" font-family="Arial,sans-serif" font-size="29" font-weight="700">Orange Finance</text>
+  <text x="58" y="219" fill="#243c45" font-family="Arial,sans-serif" font-size="53" font-weight="700">Chaque paiement.</text>
+  <text x="58" y="282" fill="#b54c27" font-family="Arial,sans-serif" font-size="53" font-weight="700">Une trace claire.</text>
+  <text x="60" y="357" fill="#5b6d75" font-family="Arial,sans-serif" font-size="23">Encaissements · Dépenses · Reçus</text>
+  <g transform="translate(733 122) rotate(8 100 120)">
+    <rect x="-20" y="5" width="226" height="278" rx="34" fill="#e3b397" opacity=".32"/>
+    <rect x="-28" y="-5" width="226" height="278" rx="30" fill="url(#orange)"/>
+    <path d="M24 48h122v162l-12-8-13 8-12-8-13 8-13-8-13 8-13-8-13 8-12-8-12 8V48z" fill="#fffaf7"/>
+    <path d="M49 78h70M49 97h47M49 155h67M49 172h48" stroke="#e3c0ae" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="146" cy="215" r="45" fill="#244b43"/>
+    <path d="m127 215 13 13 26-27" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

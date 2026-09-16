@@ -19,16 +19,18 @@ Prérequis : macOS compatible, Xcode 26 et ses outils de ligne de commande, simu
 cd mobile/ios
 xcodegen generate
 xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinance \
-  -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build
+  -sdk iphonesimulator -configuration Debug \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build
 xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinanceTests \
-  -destination 'platform=iOS Simulator,name=iPhone 17' CODE_SIGNING_ALLOWED=NO test
+  -destination 'platform=iOS Simulator,name=iPhone 17' -parallel-testing-enabled NO \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= test
 xcodebuild -project OrangeFinance.xcodeproj -scheme OrangeFinance \
   -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO build
 ```
 
 Adapter le nom du simulateur à `xcrun simctl list devices available`. Le projet Xcode est généré à partir de `project.yml` et n’est pas versionné. L’icône opaque 1024×1024 est dans `OrangeFinance/Assets.xcassets/AppIcon.appiconset/`.
 
-Identifiant provisoire : `com.ennearock.orangefinance`. Version 1.0.0, build 1. Pour signer plus tard, configurer l’équipe dans Xcode ou ajouter `DEVELOPMENT_TEAM="$APPLE_TEAM_ID"` à la commande ; aucun identifiant d’équipe n’est imposé dans le dépôt. Les builds sans signature valident la compilation, mais ne produisent pas une application distribuable sur un iPhone réel. Il faut un Mac/Xcode pour les tests natifs ; Windows ne peut pas valider leur compilation.
+Identifiant provisoire : `com.ennearock.orangefinance`. Version 1.0.0, build 1. Le simulateur utilise une signature ad hoc locale (`-`), sans compte Apple ni certificat de distribution. Pour signer un build destiné à un appareil plus tard, configurer l’équipe dans Xcode ou ajouter `DEVELOPMENT_TEAM="$APPLE_TEAM_ID"` à la commande ; aucun identifiant d’équipe n’est imposé dans le dépôt. Le build `iphoneos` sans signature valide la compilation, mais ne produit pas une application distribuable sur un iPhone réel. Il faut un Mac/Xcode pour les tests natifs ; Windows ne peut pas valider leur compilation.
 
 ## Sécurité et sessions
 

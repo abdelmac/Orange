@@ -35,7 +35,7 @@ final class WebAPIBridge {
     func request<T: Decodable>(_ path: String, method: String = "GET", body: [String: Any]? = nil) async throws -> T {
         guard OriginPolicy.allowsAPI(path: path, method: method) else { throw APIError.untrusted }
         guard let webView, OriginPolicy.isTrusted(webView.url), !webView.isLoading else { throw APIError.unavailable }
-        let value: Any
+        let value: Any?
         do {
             value = try await webView.callAsyncJavaScript(Self.script,
                 arguments: ["path": path, "method": method, "body": body.map { $0 as Any } ?? NSNull(), "expectedOrigin": OriginPolicy.origin],

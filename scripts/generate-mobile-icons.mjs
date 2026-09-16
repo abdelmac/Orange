@@ -31,8 +31,12 @@ for (const [density, size] of Object.entries({
   await icon(`mobile/android/app/src/main/res/mipmap-${density}/ic_launcher.png`, size);
 }
 await mkdir(path.join(root, "docs/mobile/assets"), { recursive: true });
+await sharp(await readFile(path.join(root, "docs/mobile/assets/play-feature.svg")))
+  .removeAlpha()
+  .png()
+  .toFile(path.join(root, "docs/mobile/assets/play-feature-1024x500.png"));
 await writeFile(
   path.join(root, "docs/mobile/assets/README.md"),
-  "# Icônes mobiles\n\nGénérées depuis `public/icon.svg` par `node scripts/generate-mobile-icons.mjs`. PNG opaques : Apple 1024 × 1024 et Google Play 512 × 512. Les captures d’écran doivent provenir des applications natives réellement exécutées ; aucune capture promotionnelle fictive n’est fournie. Le nom et la marque restent à confirmer avant publication.\n",
+  "# Visuels mobiles\n\nGénérés par `node scripts/generate-mobile-icons.mjs`. Icônes opaques issues de `public/icon.svg` : Apple 1024 × 1024 et Google Play 512 × 512. La bannière Google Play 1024 × 500 est issue de `play-feature.svg` ; elle illustre les fonctions du produit, ce n’est pas une capture d’écran.\n\nLes captures doivent provenir des applications natives réellement exécutées. Le nom et la marque restent à confirmer avant publication.\n",
 );
 console.log("Icônes Android, iOS et boutiques générées.");
