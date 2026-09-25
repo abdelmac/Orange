@@ -10,6 +10,8 @@ Les projets [Android et iOS](mobile/README.md) ajoutent une saisie native des en
 
 Depuis le tableau de bord, **Encaisser** ouvre une saisie courte : montant, nom de la personne, catégorie (client, chauffeur, commercial, employé, fournisseur ou autre), motif et caisse. Les espèces sont proposées par défaut. Le téléphone, la référence et la date se trouvent dans les détails facultatifs. Un commercial encaisse dans son portefeuille personnel et remet ensuite les fonds à la caisse. Le formulaire accepte les virgules françaises, évite les doublons lors d’une nouvelle tentative et propose immédiatement le reçu et une nouvelle saisie.
 
+Sur téléphone, le bouton **Saisir** reste accessible dans la barre inférieure depuis toutes les pages pour les utilisateurs autorisés. Le formulaire rapproche le montant du haut de l’écran, agrandit les champs tactiles et garde les détails facultatifs repliés. Le clavier s’ouvre lorsque l’utilisateur touche un champ.
+
 **Régler une facture** conserve le parcours de paiement partiel/complet existant. Un encaissement sans facture augmente la trésorerie et les encaissements, mais ne solde aucune facture et ne crée pas de vente. Pour corriger un mouvement, utiliser son annulation dans Transactions.
 
 **Demander une dépense** permet la même saisie rapide pour un bénéficiaire. La demande attend sa validation puis son paiement dans Dépenses ; elle ne débite pas immédiatement la caisse. Le reçu n’est disponible qu’après paiement. Les caissiers retrouvent les dépenses validées à payer dans ce module.
@@ -199,7 +201,7 @@ Navigation responsive PC/tablette et actions rapides mobiles. L’installation u
 
 Le service worker conserve uniquement l’écran public hors connexion et les icônes. Aucune page authentifiée, API ni pièce jointe n’est mise en cache. Les écritures financières nécessitent une connexion : elles ne sont pas mises en attente hors ligne.
 
-L’interface web et la PWA proposent les thèmes **Clair**, **Sombre** et **Système** depuis le bouton Apparence de la barre supérieure, les écrans de connexion ou **Paramètres → Apparence**. Le choix est mémorisé dans le navigateur et synchronisé entre ses onglets. Système suit les changements d’apparence de l’appareil. Le thème est appliqué avant l’affichage initial, y compris sur l’écran hors connexion ; les impressions et PDF restent adaptés au papier. La préférence d’affichage ne contient aucune donnée financière.
+L’interface web et la PWA proposent les thèmes **Clair**, **Sombre** et **Système** depuis le bouton **Thème** de la barre supérieure, les écrans de connexion ou **Paramètres → Apparence**. Sur téléphone, les trois choix sont également visibles directement dans **Menu → Apparence**. Le choix est mémorisé dans le navigateur et synchronisé entre ses onglets. Système suit les changements d’apparence de l’appareil. Le thème est appliqué avant l’affichage initial, y compris sur l’écran hors connexion ; les impressions et PDF restent adaptés au papier. La préférence d’affichage ne contient aucune donnée financière.
 
 ## Tests
 

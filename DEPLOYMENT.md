@@ -2,7 +2,15 @@
 
 Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orange à Francfort avec PostgreSQL 17 et un disque privé pour les justificatifs. Le déploiement local Docker reste disponible.
 
-## Mise à jour active — 12 septembre 2026
+## État du déploiement — 25 septembre 2026
+
+Les thèmes clair/sombre/système, le bouton **Thème** visible, le choix **Menu → Apparence** sur téléphone, la recherche avec une seule loupe et l’accès permanent **Saisir** sont présents dans le dépôt. **Cette mise à jour n’est pas encore publiée sur Render.** La page `/login` en ligne répond HTTP 200 mais ne contient pas le nouveau sélecteur de thème. L’API Render retourne toujours 401 avec l’authentification locale disponible ; l’identifiant exact du déploiement courant ne peut donc pas être confirmé par cette API.
+
+Reconnecter Render pour publier le commit validé, ou lancer un déploiement manuel depuis le [service existant](https://dashboard.render.com/web/srv-dai090bm8hqs73dkpgk0). Le déploiement automatique reste désactivé. Aucune migration n’est ajoutée par ces corrections d’interface.
+
+Validation locale de cette mise à jour : TypeScript, lint, formatage des fichiers d’interface modifiés, 29 tests unitaires et build réussis. Sur le build de production, 73 contrôles de recherche/navigation/saisie mobile et 184 contrôles de thème passent, notamment la persistance, les permissions de navigation, l’impression et le repli PWA hors connexion. Les contrôles visuels utilisent des réponses API simulées et ne créent aucune opération financière.
+
+## Dernier déploiement confirmé — 12 septembre 2026
 
 ### Préparation des boutiques — 16 septembre 2026
 
