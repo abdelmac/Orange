@@ -628,6 +628,7 @@
 }
 
 :root {
+  color-scheme: light;
   --bg: #f7f8fa;
   --surface: #fff;
   --ink: #242c32;
@@ -641,6 +642,14 @@
   --sidebar: 244px;
   --radius: 13px;
   --shadow: 0 2px 5px #25314503;
+  --surface-muted: #f7f8fa;
+  --surface-hover: #f3f4f6;
+  --text-secondary: #555d66;
+  --border-strong: #d9dfe5;
+  --chart-grid: #eceef1;
+  --chart-label: #9a9eaa;
+  --chart-sales: #e96532;
+  --chart-expenses: #738d7f;
   --font-sans: Arial, Helvetica, sans-serif;
 }
 * {
@@ -1256,6 +1265,8 @@ small {
 .breadcrumb {
   display: flex;
   align-items: center;
+  min-width: 0;
+  flex: 1;
   gap: 12px;
   font-size: 10px;
   white-space: nowrap;
@@ -1264,6 +1275,8 @@ small {
 .breadcrumb strong {
   color: #69727c;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .breadcrumb > svg {
   color: #b6bac2;
@@ -1271,6 +1284,7 @@ small {
 .topbar-tools {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 14px;
 }
 .global-search {
@@ -3244,6 +3258,9 @@ tbody tr:hover {
   }
 }
 @media (max-width: 1020px) {
+  .breadcrumb > .desktop-only {
+    display: none;
+  }
   .global-search {
     width: 180px;
   }
@@ -4261,6 +4278,7 @@ tbody tr:hover {
   line-height: 1.85;
   color: #919fa9;
 }
+
 @media (max-width: 760px) {
   .mobile-quick-actions.quick-count-2,
   .metric-grid.metric-count-3 {

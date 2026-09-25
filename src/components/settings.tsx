@@ -1,7 +1,8 @@
 ﻿"use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Globe2, LockKeyhole, Save, ShieldCheck } from "lucide-react";
+import { Building2, Globe2, LockKeyhole, Moon, Save, ShieldCheck } from "lucide-react";
+import { ThemeOptions } from "./theme-picker";
 import { useSession } from "./app-shell";
 import { api, post } from "./api";
 import { value } from "@/lib/format";
@@ -62,6 +63,16 @@ export function Settings() {
         </div>
       </div>
       <div className="settings-grid">
+        <section className="card settings-card theme-settings permissions-card">
+          <h2>
+            <Moon size={19} /> Apparence
+          </h2>
+          <p className="muted">
+            Choisissez votre thème. Le mode Système suit l’apparence de votre appareil. Votre
+            préférence est mémorisée dans ce navigateur.
+          </p>
+          <ThemeOptions />
+        </section>
         <section className="card settings-card">
           <h2>Mon profil</h2>
           <dl className="detail-fields">

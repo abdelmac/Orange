@@ -29,6 +29,7 @@ import {
 import { api, post } from "./api";
 import { Row, value } from "@/lib/format";
 import { translate } from "@/lib/i18n";
+import { ThemePicker } from "./theme-picker";
 
 interface Session {
   user: Row;
@@ -372,6 +373,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </div>
                 )}
               </div>
+              <ThemePicker />
               <div className="notification-wrap">
                 <button
                   className="icon-button notification-button"

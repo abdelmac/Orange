@@ -20,6 +20,13 @@
   border-bottom: 1px solid #e6e9ed;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
 .brand,
 .login,
 .contact {
@@ -205,6 +212,13 @@
   .header {
     min-height: 80px;
     gap: 12px;
+    flex-wrap: wrap;
+    padding-block: 16px;
+  }
+
+  .headerActions {
+    gap: 12px;
+    margin-left: auto;
   }
 
   .brand {
@@ -248,5 +262,65 @@
 
   .content {
     padding-bottom: 32px;
+  }
+}
+
+@media screen {
+  :global(html[data-theme="dark"]) .page {
+    color: var(--ink);
+    background: radial-gradient(ellipse at 100% 0%, #3b2c254f 0%, transparent 40%), var(--bg);
+  }
+
+  :global(html[data-theme="dark"]) .header,
+  :global(html[data-theme="dark"]) .footer {
+    border-color: var(--line);
+  }
+
+  :global(html[data-theme="dark"]) .brand strong,
+  :global(html[data-theme="dark"]) .login,
+  :global(html[data-theme="dark"]) .navigation a,
+  :global(html[data-theme="dark"]) .hero p,
+  :global(html[data-theme="dark"]) .section p,
+  :global(html[data-theme="dark"]) .section li {
+    color: var(--text-secondary);
+  }
+
+  :global(html[data-theme="dark"]) .navigation a[aria-current="page"] {
+    color: var(--orange);
+    background: var(--orange-light);
+  }
+
+  :global(html[data-theme="dark"]) .eyebrow,
+  :global(html[data-theme="dark"]) .section h2 svg,
+  :global(html[data-theme="dark"]) .section a:not(.contact) {
+    color: var(--orange);
+  }
+
+  :global(html[data-theme="dark"]) .section {
+    background: var(--surface);
+    border-color: var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  :global(html[data-theme="dark"]) .section strong {
+    color: var(--ink);
+  }
+
+  :global(html[data-theme="dark"]) .highlight {
+    background: linear-gradient(115deg, #302923, var(--surface));
+    border-color: #654a35;
+  }
+
+  :global(html[data-theme="dark"]) .contact {
+    background: #bf4b1e;
+    color: #fff;
+  }
+
+  :global(html[data-theme="dark"]) .contact:hover {
+    background: #a9421c;
+  }
+
+  :global(html[data-theme="dark"]) .footer {
+    color: var(--muted);
   }
 }

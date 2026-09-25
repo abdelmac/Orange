@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, ShieldCheck } from "lucide-react";
 import { Brand } from "./app-shell";
 import { post } from "./api";
+import { ThemePicker } from "./theme-picker";
 
 const subscribeHydration = () => () => {};
 
@@ -98,6 +99,9 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
         <div className="auth-orbit orbit-two" />
       </aside>
       <main className="auth-main">
+        <div className="auth-theme-picker">
+          <ThemePicker />
+        </div>
         <div className="auth-mobile-brand">
           <Brand />
         </div>
@@ -200,7 +204,7 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
               gap: 18,
               marginTop: 8,
               fontSize: 12,
-              color: "#737b85",
+              color: "var(--muted)",
             }}
           >
             <Link href="/assistance" style={{ paddingBlock: 12 }}>

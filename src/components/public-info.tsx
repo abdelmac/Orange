@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import styles from "./public-info.module.css";
+import { ThemePicker } from "./theme-picker";
 
 export const SUPPORT_EMAIL = "ennearock@gmail.com";
 
@@ -28,9 +29,12 @@ export function PublicInfo({
             Orange <strong>Finance</strong>
           </span>
         </Link>
-        <Link className={styles.login} href="/login">
-          <ArrowLeft size={16} aria-hidden="true" /> Connexion
-        </Link>
+        <div className={styles.headerActions}>
+          <ThemePicker />
+          <Link className={styles.login} href="/login">
+            <ArrowLeft size={16} aria-hidden="true" /> Connexion
+          </Link>
+        </div>
       </header>
       <main className={styles.main}>
         <nav className={styles.navigation} aria-label="Informations publiques">

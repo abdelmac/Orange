@@ -1,45 +1,86 @@
 <!doctype html>
 <html lang="fr">
-  <meta charset="utf-8" /><meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  /><title>Orange · Hors connexion</title
-  ><style>
-    body {
-      font: 16px system-ui;
-      background: #f8f9fb;
-      color: #26332e;
-      display: grid;
-      place-items: center;
-      min-height: 90vh;
-      margin: 0;
-    }
-    main {
-      max-width: 420px;
-      padding: 32px;
-    }
-    h1 {
-      font-size: 28px;
-    }
-    a {
-      display: inline-block;
-      background: #e96532;
-      color: white;
-      padding: 14px 22px;
-      border-radius: 10px;
-      text-decoration: none;
-    }
-    p {
-      line-height: 1.7;
-      color: #66716c;
-    }
-  </style>
-  <main>
-    <h1>Retrouvons la connexion.</h1>
-    <p>
-      Vos données restent en sécurité. Reconnectez-vous à Internet pour consulter votre activité ou
-      enregistrer une opération.
-    </p>
-    <a href="/">Réessayer</a>
-  </main>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f9fb" />
+    <title>Orange · Hors connexion</title>
+    <script>
+      (() => {
+        const system = window.matchMedia("(prefers-color-scheme: dark)");
+        const apply = () => {
+          let preference = "system";
+          try {
+            preference = localStorage.getItem("orange-theme") || "system";
+          } catch {}
+          const dark = preference === "dark" || (preference !== "light" && system.matches);
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+          document.querySelector('meta[name="theme-color"]').content = dark ? "#101719" : "#f8f9fb";
+        };
+        apply();
+        system.addEventListener("change", apply);
+        window.addEventListener("storage", apply);
+      })();
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        --offline-background: #f8f9fb;
+        --offline-text: #26332e;
+        --offline-muted: #66716c;
+      }
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --offline-background: #101719;
+        --offline-text: #eef1f4;
+        --offline-muted: #a9b5c2;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) {
+          color-scheme: dark;
+          --offline-background: #101719;
+          --offline-text: #eef1f4;
+          --offline-muted: #a9b5c2;
+        }
+      }
+      body {
+        font: 16px system-ui;
+        background: var(--offline-background);
+        color: var(--offline-text);
+        display: grid;
+        place-items: center;
+        min-height: 90vh;
+        margin: 0;
+      }
+      main {
+        max-width: 420px;
+        padding: 32px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      a {
+        display: inline-block;
+        background: #e96532;
+        color: white;
+        padding: 14px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+      }
+      p {
+        line-height: 1.7;
+        color: var(--offline-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Retrouvons la connexion.</h1>
+      <p>
+        Vos données restent en sécurité. Reconnectez-vous à Internet pour consulter votre activité
+        ou enregistrer une opération.
+      </p>
+      <a href="/">Réessayer</a>
+    </main>
+  </body>
 </html>

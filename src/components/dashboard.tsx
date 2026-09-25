@@ -60,14 +60,14 @@ export function ActivityChart({
       <svg viewBox="0 0 720 230">
         <defs>
           <linearGradient id="sales-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e96532" stopOpacity=".16" />
-            <stop offset="100%" stopColor="#e96532" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--chart-sales)" stopOpacity=".16" />
+            <stop offset="100%" stopColor="var(--chart-sales)" stopOpacity="0" />
           </linearGradient>
         </defs>
         {[40, 88, 136, 185].map((y, i) => (
           <g key={y}>
-            <line x1="40" y1={y} x2="685" y2={y} stroke="#eceef1" strokeDasharray="4 5" />
-            <text x="30" y={y + 4} textAnchor="end" fontSize="10" fill="#9a9eaa">
+            <line x1="40" y1={y} x2="685" y2={y} stroke="var(--chart-grid)" strokeDasharray="4 5" />
+            <text x="30" y={y + 4} textAnchor="end" fontSize="10" fill="var(--chart-label)">
               {i === 3 ? "0" : `${Math.round((max * (3 - i)) / 3 / 100)}`}
             </text>
           </g>
@@ -76,7 +76,7 @@ export function ActivityChart({
         <polyline
           points={sales}
           fill="none"
-          stroke="#e96532"
+          stroke="var(--chart-sales)"
           strokeWidth="3"
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -85,7 +85,7 @@ export function ActivityChart({
           <polyline
             points={expenses}
             fill="none"
-            stroke="#738d7f"
+            stroke="var(--chart-expenses)"
             strokeWidth="2.5"
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -105,7 +105,7 @@ export function ActivityChart({
               y="216"
               textAnchor="middle"
               fontSize="10"
-              fill="#959aa5"
+              fill="var(--chart-label)"
             >
               {date(p.date).slice(0, 7)}
             </text>

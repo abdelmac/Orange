@@ -199,6 +199,8 @@ Navigation responsive PC/tablette et actions rapides mobiles. L’installation u
 
 Le service worker conserve uniquement l’écran public hors connexion et les icônes. Aucune page authentifiée, API ni pièce jointe n’est mise en cache. Les écritures financières nécessitent une connexion : elles ne sont pas mises en attente hors ligne.
 
+L’interface web et la PWA proposent les thèmes **Clair**, **Sombre** et **Système** depuis le bouton Apparence de la barre supérieure, les écrans de connexion ou **Paramètres → Apparence**. Le choix est mémorisé dans le navigateur et synchronisé entre ses onglets. Système suit les changements d’apparence de l’appareil. Le thème est appliqué avant l’affichage initial, y compris sur l’écran hors connexion ; les impressions et PDF restent adaptés au papier. La préférence d’affichage ne contient aucune donnée financière.
+
 ## Tests
 
 ```sh

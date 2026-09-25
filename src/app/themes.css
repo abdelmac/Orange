@@ -1,0 +1,598 @@
+/* Appearance controls share the same palette on public and authenticated pages. */
+.theme-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+.theme-trigger {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+.theme-trigger[aria-expanded="true"] {
+  color: var(--orange);
+  background: var(--orange-light);
+}
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 90;
+  width: 205px;
+  max-width: calc(100vw - 32px);
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 36px #00000024;
+}
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+}
+.theme-option:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+.theme-option[aria-pressed="true"] {
+  background: var(--orange-light);
+  color: var(--orange);
+}
+.theme-option > svg:last-child:not(:first-child) {
+  margin-left: auto;
+}
+.theme-settings {
+  display: grid;
+  gap: 16px;
+}
+.theme-settings p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.theme-options {
+  display: grid;
+  gap: 4px;
+}
+.theme-settings .theme-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.theme-settings .theme-option {
+  width: auto;
+  flex: 1 1 115px;
+  justify-content: center;
+  border: 1px solid var(--line);
+}
+.theme-settings .theme-option[aria-pressed="true"] {
+  border-color: var(--orange);
+}
+.auth-theme-picker {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 5;
+}
+
+/* Screen-only colors keep invoices and browser printouts on white paper. */
+@media screen {
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #101719;
+    --surface: #192225;
+    --surface-muted: #202b2e;
+    --surface-hover: #283538;
+    --ink: #edf3f1;
+    --text-secondary: #c4d1cd;
+    --muted: #a1b3af;
+    --line: #2f3d3f;
+    --border-strong: #506362;
+    --orange: #ffad80;
+    --orange-dark: #a9421c;
+    --orange-light: #3b2c25;
+    --green: #91d6ae;
+    --red: #f6a5a2;
+    --shadow: 0 2px 8px #00000012;
+    --chart-grid: #334345;
+    --chart-label: #a1b3af;
+    --chart-sales: #ffad80;
+    --chart-expenses: #91d6ae;
+  }
+  html[data-theme="dark"] ::selection {
+    background: #77503a;
+    color: #fff;
+  }
+  html[data-theme="dark"]
+    :is(
+      .sidebar,
+      .sidebar-bottom,
+      .topbar,
+      .card,
+      .metric-card,
+      .notification-panel,
+      .search-results,
+      .daybook-totals > article,
+      .mini-metrics > div,
+      .desktop-quick-actions > a,
+      .mobile-quick-actions > a,
+      .expense-workflow > button,
+      .modal,
+      .modal-header,
+      .form-footer,
+      .auth-page,
+      .button.secondary
+    ) {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+  html[data-theme="dark"]
+    :is(
+      .company-switch,
+      .empty-state > span,
+      .count,
+      .quick-direction-tabs,
+      .global-search kbd,
+      .advanced-filters,
+      .confirmation-summary,
+      .invoice-summary,
+      .form-note,
+      .attachment-upload,
+      .audit-values pre,
+      .permission-list code,
+      .expense-workflow b,
+      th
+    ) {
+    background: var(--surface-muted);
+    border-color: var(--line);
+  }
+  html[data-theme="dark"]
+    :is(
+      .button.secondary,
+      .nav-link,
+      .breadcrumb strong,
+      .dropdown-heading,
+      .table-identity strong,
+      .records-table .table-identity strong,
+      .daybook-description,
+      .daybook-operation-top > div strong,
+      .detail-fields dd,
+      .attachment-file strong,
+      .attachment-upload strong,
+      .form-note strong,
+      .supplier-reminder strong,
+      .confirmation-summary > strong,
+      .field > span,
+      .auth-form-card .field > span,
+      .empty-small,
+      .cash-list strong,
+      .mobile-quick-actions span,
+      .quick-extra > summary,
+      .quick-direction-tabs > a,
+      .expense-workflow > button,
+      td,
+      .records-table td
+    ) {
+    color: var(--text-secondary);
+  }
+  html[data-theme="dark"]
+    :is(
+      .eyebrow,
+      .icon-button,
+      .company-switch span,
+      .company-switch > svg,
+      .nav-group,
+      .secure-note,
+      .secure-note small,
+      .profile small,
+      .profile > svg,
+      .breadcrumb,
+      .breadcrumb > svg,
+      .global-search,
+      .search-results small,
+      .app-footer,
+      .page-heading p,
+      .card-heading p,
+      .card-footer-link,
+      .period-filter,
+      .metric-label,
+      .metric-description,
+      .chart-legend,
+      .chart-totals span,
+      .cash-summary-total > span,
+      .cash-list small,
+      .desktop-quick-actions small,
+      .desktop-quick-actions > a > svg,
+      .table-identity small,
+      .records-table .table-identity small,
+      .pending-list small,
+      .supplier-reminder,
+      .all-clear p,
+      .collection-search,
+      .table-pagination,
+      .mini-metrics > div > span,
+      .mini-metrics small,
+      .register-note,
+      .modal-header p,
+      .form-note,
+      .form-footer > span,
+      .confirmation-summary > span,
+      .confirmation-summary > p,
+      .detail-fields dt,
+      .invoice-summary span,
+      .attachment-file,
+      .attachment-upload p,
+      .attachment-upload > svg,
+      .audit-values h4,
+      .audit-values pre,
+      .permission-list code,
+      .auth-form-card > .muted,
+      .auth-security,
+      .auth-copyright,
+      .back-login,
+      .password-input > button,
+      .portfolio-explanation p,
+      .daybook-date > svg,
+      .daybook-totals > article > span,
+      .daybook-scope-note,
+      .daybook-count,
+      .daybook-route,
+      .daybook-reversal,
+      .daybook-internal,
+      .daybook-integration-export,
+      .daybook-operation-top > div small,
+      .daybook-operation > p,
+      .daybook-operation-bottom > small,
+      .quick-extra > summary > span,
+      .quick-extra-grid small,
+      .quick-invoice-link,
+      .quick-success > p,
+      th
+    ) {
+    color: var(--muted);
+  }
+  html[data-theme="dark"] .brand {
+    color: var(--ink);
+  }
+  html[data-theme="dark"]
+    :is(
+      .profile,
+      .quick-extra,
+      .quick-success-footer,
+      .daybook-operation,
+      .search-results > a,
+      .notification-item,
+      .card-footer-link,
+      .chart-totals > div,
+      .cash-summary-total,
+      th,
+      td,
+      .pending-list > a,
+      .supplier-reminder,
+      .report-row,
+      .collection-toolbar,
+      .table-pagination,
+      .form-footer,
+      .attachment-file
+    ) {
+    border-color: var(--line);
+  }
+  html[data-theme="dark"] :is(.side-nav, .table-scroll, .modal, .audit-values pre) {
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  html[data-theme="dark"]
+    :is(
+      .icon-button:hover,
+      .nav-link:hover,
+      .search-results > a:hover,
+      .button.secondary:hover,
+      tbody tr:hover
+    ) {
+    background: var(--surface-hover);
+    color: var(--ink);
+  }
+  html[data-theme="dark"]
+    :is(
+      .nav-link.active,
+      .button.selected,
+      .quick-direction-tabs > a.active,
+      .expense-workflow > button.selected
+    ) {
+    background: var(--orange-light);
+    border-color: #76513d;
+    color: var(--orange);
+  }
+  html[data-theme="dark"]
+    :is(
+      .nav-link.active svg,
+      .daybook-receipt,
+      .quick-invoice-link > span,
+      .forgot-link,
+      .field b
+    ) {
+    color: var(--orange);
+  }
+  html[data-theme="dark"] .button.primary {
+    background: #bf4b1e;
+    border-color: #d66a3e;
+    color: #fff;
+    box-shadow: 0 3px 10px #00000012;
+  }
+  html[data-theme="dark"] .button.primary:hover {
+    background: var(--orange-dark);
+  }
+  html[data-theme="dark"] .button.white {
+    background: #f1d8c8;
+    color: #57331e;
+  }
+  html[data-theme="dark"] :is(.card-footer-link:hover, .desktop-quick-actions > a:hover) {
+    background: var(--orange-light);
+    color: var(--orange);
+    border-color: #76513d;
+  }
+  html[data-theme="dark"]
+    :is(
+      .field > input,
+      .field > select,
+      .field > textarea,
+      .password-input,
+      .daybook-date input,
+      .period-filter input,
+      .period-filter select,
+      .collection-filter-controls select,
+      .auth-form-card .field > input,
+      .auth-form-card .password-input
+    ) {
+    background: #131d20;
+    border-color: var(--border-strong);
+    color: var(--ink);
+  }
+  html[data-theme="dark"]
+    :is(.global-search input, .collection-search input, .password-input > input) {
+    color: var(--ink);
+  }
+  html[data-theme="dark"] :is(input, textarea)::placeholder {
+    color: #90a39f;
+    opacity: 1;
+  }
+  html[data-theme="dark"] .field :is(input, select, textarea):focus {
+    border-color: var(--orange);
+    outline-color: #ffad803b;
+  }
+  html[data-theme="dark"] .password-input:focus-within {
+    border-color: var(--orange);
+    outline: 3px solid #ffad803b;
+  }
+  html[data-theme="dark"] input::file-selector-button {
+    background: var(--surface-hover);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    padding: 7px 10px;
+    margin-right: 10px;
+  }
+  html[data-theme="dark"] input:autofill {
+    box-shadow: 0 0 0 100px #131d20 inset;
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+  }
+  html[data-theme="dark"] .topbar-divider {
+    background: var(--line);
+  }
+  html[data-theme="dark"] .notification-button i {
+    border-color: var(--surface);
+  }
+  html[data-theme="dark"] .spinner:not(.small) {
+    border-color: var(--line);
+    border-top-color: var(--orange);
+  }
+  html[data-theme="dark"]
+    :is(
+      .company-avatar,
+      .operation-icon.in,
+      .quick-success-icon,
+      .all-clear > span,
+      .row-action-button.green
+    ) {
+    background: #243d32;
+    border-color: #3e6550;
+    color: var(--green);
+  }
+  html[data-theme="dark"]
+    :is(
+      .avatar,
+      .quick-icon,
+      .document-icon,
+      .metric-icon.orange,
+      .operation-icon.out,
+      .row-action-button,
+      .auth-lock
+    ) {
+    background: var(--orange-light);
+    border-color: #644932;
+    color: #f2b58d;
+  }
+  html[data-theme="dark"] :is(.metric-icon.pink, .icon-button.danger:hover) {
+    background: #462e2f;
+    color: var(--red);
+  }
+  html[data-theme="dark"] :is(.cash-icon, .metric-icon.blue, .badge) {
+    background: #2b3947;
+    color: #b5cbe8;
+  }
+  html[data-theme="dark"] .tone-0 {
+    background: #2b3947 !important;
+    color: #b5cbe8 !important;
+  }
+  html[data-theme="dark"] .tone-1 {
+    background: #3c3046 !important;
+    color: #d6b7e6 !important;
+  }
+  html[data-theme="dark"] .tone-2 {
+    background: #243d32 !important;
+    color: #91d6ae !important;
+  }
+  html[data-theme="dark"] .tone-3 {
+    background: #3b2c25 !important;
+    color: #f2b58d !important;
+  }
+  html[data-theme="dark"]
+    :is(.badge.status-paid, .badge.status-approved, .badge.status-validated, .alert.success) {
+    background: #243d32;
+    border-color: #3e6550;
+    color: #a1dfb9;
+  }
+  html[data-theme="dark"]
+    :is(
+      .badge.status-pending,
+      .badge.status-partially_paid,
+      .pending-icon,
+      .count.amber,
+      .quick-success-icon.pending
+    ) {
+    background: #403622;
+    color: #edcd8b;
+  }
+  html[data-theme="dark"]
+    :is(.badge.status-issued, .badge.status-invoiced, .badge.status-confirmed) {
+    background: #293b50;
+    color: #b0cef2;
+  }
+  html[data-theme="dark"]
+    :is(
+      .badge.status-rejected,
+      .badge.status-cancelled,
+      .badge.status-reversed,
+      .badge.status-overdue,
+      .alert.error
+    ) {
+    background: #462e2f;
+    border-color: #754546;
+    color: #ffc0b9;
+  }
+  html[data-theme="dark"] .metric-card.featured {
+    background: #653d2b;
+    border-color: #8b583a;
+    color: #fff5ec;
+  }
+  html[data-theme="dark"] :is(.featured .metric-label, .featured .metric-description) {
+    color: #f5d6be;
+  }
+  html[data-theme="dark"] .featured .metric-icon {
+    background: #ffffff14;
+    color: #fff5ec;
+  }
+  html[data-theme="dark"] :is(.held-summary, .quick-empty-account) {
+    background: #332d22;
+    border-color: #665539;
+    color: #dbc598;
+  }
+  html[data-theme="dark"] .held-summary strong {
+    color: #f5d699;
+  }
+  html[data-theme="dark"] .quick-amount-field {
+    background: #302923;
+    border-color: #654a35;
+  }
+  html[data-theme="dark"] .quick-amount-field > span {
+    color: #d7bca7;
+  }
+  html[data-theme="dark"] :is(.quick-amount-field input, .quick-amount-field > div > span) {
+    color: #ffbd91;
+  }
+  html[data-theme="dark"] .quick-amount-field input::placeholder {
+    color: #bf9d84;
+  }
+  html[data-theme="dark"] .quick-amount-field:focus-within {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px #ffad8026;
+  }
+  html[data-theme="dark"] .quick-destination {
+    background: #20332b;
+    border-color: #3a5547;
+    color: #b5d3c2;
+  }
+  html[data-theme="dark"] .sale-total {
+    background: var(--orange-light);
+    border-color: #654a35;
+  }
+  html[data-theme="dark"] .sale-total > span {
+    color: #d7bca7;
+  }
+  html[data-theme="dark"] .sale-total > strong {
+    color: #ffbd91;
+  }
+  html[data-theme="dark"] .cash-page-summary {
+    background: #233c30;
+    box-shadow: inset 0 0 0 1px #3c5949;
+  }
+  html[data-theme="dark"] .cash-page-summary small {
+    color: #b0c7b9;
+  }
+  html[data-theme="dark"]
+    :is(.cash-page-summary > svg, .form-note svg, .secure-note > svg, .portfolio-explanation) {
+    color: #a2c9b2;
+  }
+  html[data-theme="dark"] .modal::backdrop {
+    background: #050c12b8;
+  }
+  html[data-theme="dark"] .auth-story {
+    background: #172f24;
+  }
+  html[data-theme="dark"] .auth-story .brand {
+    color: white;
+  }
+  html[data-theme="dark"] .auth-story-bottom {
+    color: #b0c5b8;
+  }
+  html[data-theme="dark"] .eyebrow.light {
+    color: #eeb99a;
+  }
+}
+@media screen and (max-width: 760px) {
+  .auth-theme-picker {
+    top: 28px;
+    right: 25px;
+  }
+  html[data-theme="dark"] .sidebar-overlay {
+    background: #050c12b8;
+  }
+  html[data-theme="dark"] .mobile-bottom-nav {
+    background: #192225f5;
+    border-color: var(--line);
+  }
+  html[data-theme="dark"] .mobile-bottom-nav > :is(a, button) {
+    color: var(--muted);
+  }
+  html[data-theme="dark"] .mobile-bottom-nav .active {
+    color: var(--orange);
+  }
+  html[data-theme="dark"] .mobile-quick-actions > a:first-child {
+    background: var(--orange-light);
+    border-color: #76513d;
+  }
+  html[data-theme="dark"]
+    :is(.mobile-quick-actions > a, .mobile-quick-actions > a:first-child span) {
+    color: var(--orange);
+  }
+  html[data-theme="dark"] :is(.sale-line, .global-search.mobile-search-open) {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+}
+@media print {
+  .theme-picker,
+  .theme-settings {
+    display: none !important;
+  }
+}
