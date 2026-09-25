@@ -29,7 +29,7 @@ import {
 import { api, post } from "./api";
 import { Row, value } from "@/lib/format";
 import { translate } from "@/lib/i18n";
-import { ThemePicker } from "./theme-picker";
+import { ThemeOptions, ThemePicker } from "./theme-picker";
 
 interface Session {
   user: Row;
@@ -235,6 +235,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       : can(item.permission),
   );
   const title = navigation.find((item) => item.href === pathname)?.label || "Votre espace";
+  const mobileLinks = ["/", "/journal", "/saisie", "/depenses"]
+    .map((href) => visible.find((item) => item.href === href))
+    .filter((item) => item !== undefined);
   const initials = value(session.user, "name", "U")
     .split(" ")
     .map((s) => s[0])
@@ -269,6 +272,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <ChevronDown size={14} />
           </div>
+          <section className="sidebar-appearance" aria-label="Apparence">
+            <h2>Apparence</h2>
+            <ThemeOptions />
+          </section>
           <nav className="side-nav" aria-label="Navigation principale">
             {visible.map((item) => (
               <div key={item.href}>
@@ -320,6 +327,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <button
                 className="icon-button mobile-search-toggle"
                 aria-label="Rechercher"
+                aria-expanded={mobileSearch}
                 onClick={() => setMobileSearch(!mobileSearch)}
               >
                 <Search size={19} />
@@ -332,7 +340,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
-                <kbd>⌕</kbd>
                 {query.trim().length >= 2 && (
                   <div className="search-results">
                     <div className="dropdown-heading">
@@ -436,15 +443,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </footer>
         </div>
         <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
-          {visible
-            .filter((n) => ["/", "/encaissements", "/depenses", "/clients"].includes(n.href))
-            .map((n) => (
-              <Link key={n.href} href={n.href} className={pathname === n.href ? "active" : ""}>
-                <n.icon size={21} />
-                <span>{n.href === "/" ? "Accueil" : n.label}</span>
-              </Link>
-            ))}
-          <button onClick={() => setMobile(true)}>
+          {mobileLinks.map((n) => (
+            <Link
+              key={n.href}
+              href={n.href}
+              className={`${pathname === n.href ? "active" : ""} ${n.href === "/saisie" ? "mobile-quick-entry" : ""}`}
+              aria-label={n.href === "/saisie" ? "Saisie rapide" : undefined}
+              aria-current={pathname === n.href ? "page" : undefined}
+            >
+              <span
+                className={n.href === "/saisie" ? "mobile-quick-entry-icon" : "mobile-nav-icon"}
+              >
+                <n.icon size={22} aria-hidden="true" />
+              </span>
+              <span>
+                {n.href === "/"
+                  ? "Accueil"
+                  : n.href === "/saisie"
+                    ? "Saisir"
+                    : n.href === "/journal"
+                      ? "Journal"
+                      : n.label}
+              </span>
+            </Link>
+          ))}
+          <button onClick={() => setMobile(true)} aria-expanded={mobile}>
             <Menu size={21} />
             <span>Menu</span>
           </button>

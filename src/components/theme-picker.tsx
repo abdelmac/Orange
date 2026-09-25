@@ -75,12 +75,13 @@ export function ThemePicker() {
         type="button"
         className="icon-button theme-trigger"
         aria-label={`Choisir le thème, actuel : ${selected.label}`}
-        title="Apparence"
+        title="Thème clair, sombre ou système"
         aria-expanded={open}
         aria-controls={open ? id : undefined}
         onClick={() => setOpen(!open)}
       >
         <Icon size={19} aria-hidden="true" />
+        <span className="theme-trigger-label">Thème</span>
       </button>
       {open && (
         <div className="theme-menu" id={id}>

@@ -22,6 +22,7 @@ import { translate } from "@/lib/i18n";
 import { allItems, post } from "./api";
 import { useSession } from "./app-shell";
 import { Badge, ErrorMessage } from "./ui";
+import "./quick-entry-mobile.css";
 
 type Direction = "IN" | "OUT";
 interface EntryResult {
@@ -51,14 +52,14 @@ export function QuickEntry() {
   const allowed = direction === "IN" ? canReceive : canRequest;
   return (
     <div className="quick-entry-page">
-      <div className="page-heading">
+      <div className="page-heading quick-entry-heading">
         <div>
           <div className="eyebrow">LE QUOTIDIEN, SIMPLEMENT</div>
           <h1>{direction === "IN" ? "Encaisser" : "Demander une dépense"}</h1>
           <p>
             {direction === "IN"
-              ? "Un montant, une personne, un motif. Votre reçu est prêt après l’enregistrement."
-              : "Décrivez la dépense. Elle suivra ensuite le circuit de validation et de paiement."}
+              ? "Montant, personne, motif. Enregistrez pour obtenir votre reçu."
+              : "Décrivez la dépense pour la soumettre à validation."}
           </p>
         </div>
         {can("transactions.view") && (
@@ -311,8 +312,8 @@ function QuickEntryForm({ direction }: { direction: Direction }) {
               inputMode="decimal"
               placeholder="0,00"
               required
-              autoFocus
               autoComplete="off"
+              enterKeyHint="next"
               aria-label="Montant"
               maxLength={22}
             />
@@ -349,7 +350,7 @@ function QuickEntryForm({ direction }: { direction: Direction }) {
           </div>
         )}
         <div className="quick-person-grid">
-          <label className="field">
+          <label className="field quick-party-kind">
             <span>{direction === "IN" ? "Reçu de" : "Bénéficiaire"}</span>
             <select name="partyKind" defaultValue={direction === "IN" ? "CLIENT" : "SUPPLIER"}>
               {partyKinds.map(([key, label]) => (
@@ -360,13 +361,14 @@ function QuickEntryForm({ direction }: { direction: Direction }) {
             </select>
           </label>
           <label className="field">
-            <span>Nom de la personne ou de l’entreprise *</span>
+            <span>Nom ou entreprise *</span>
             <input
               name="partyName"
               placeholder="Ex. Jean Dupont"
               required
               maxLength={200}
               autoComplete="name"
+              enterKeyHint="next"
             />
           </label>
         </div>
@@ -382,6 +384,7 @@ function QuickEntryForm({ direction }: { direction: Direction }) {
             minLength={3}
             maxLength={500}
             required
+            enterKeyHint="next"
           />
         </label>
         <div className="quick-payment-grid">

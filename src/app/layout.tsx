@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { THEME_COLORS, themeInitializationScript } from "@/lib/theme";
 import "./globals.css";
 import "./themes.css";
+import "./mobile-navigation.css";
 
 export const metadata: Metadata = {
   title: { default: "Orange · Gestion d’entreprise", template: "%s · Orange" },

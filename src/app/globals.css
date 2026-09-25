@@ -1308,15 +1308,6 @@ small {
 .global-search input::placeholder {
   color: #a2a7b0;
 }
-.global-search kbd {
-  font-size: 12px;
-  background: #fafafa;
-  border: 1px solid #e8e9ed;
-  border-radius: 4px;
-  height: 20px;
-  width: 22px;
-  text-align: center;
-}
 .topbar-divider {
   height: 23px;
   width: 1px;
@@ -3266,9 +3257,6 @@ tbody tr:hover {
   }
   .global-search input {
     font-size: 9px;
-  }
-  .global-search kbd {
-    display: none;
   }
   .topbar-tools {
     gap: 8px;
