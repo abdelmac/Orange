@@ -1,8 +1,10 @@
 # Publication App Store et Google Play
 
-Vérification documentaire : **16 septembre 2026**. Ce dossier prépare la publication ; il ne constitue ni une soumission ni une approbation des stores. L’utilisateur a confirmé ne posséder aucun compte développeur Apple/Google. Contact de support confirmé : **ennearock@gmail.com**. Le nom juridique de l’éditeur, son adresse et ses comptes développeur restent à fournir.
+Vérification documentaire initiale : **16 septembre 2026**. Mise à jour du titulaire le **26 septembre 2026** : le compte Apple Developer individuel est déclaré activé dans App Store Connect ; cet accès n’a pas encore été vérifié par API. Le compte Google Play reste à confirmer. Ce dossier prépare la publication ; il ne constitue ni une soumission ni une approbation des stores. Contact de support confirmé : **ennearock@gmail.com**. Le nom juridique et l’adresse de l’éditeur restent à fournir.
 
 Le nom proposé est **Orange Finance**, avec l’identifiant provisoire `com.ennearock.orangefinance`. Le propriétaire doit confirmer le nom, les droits sur la marque et l’identifiant avant le premier envoi. Les valeurs non confirmées sont explicites dans [listing.fr-FR.draft.json](listing.fr-FR.draft.json) ; ne pas importer ce brouillon automatiquement dans un store.
+
+**Choix confirmé le 26 septembre 2026 : publication Apple au nom personnel du propriétaire, avec un compte Individual activé selon sa confirmation.** Aucun D-U-N-S n’est nécessaire pour ce type de compte ; le nom légal du titulaire apparaîtra comme vendeur. Le propriétaire ne dispose pas de Mac personnel : le [parcours depuis Windows](APPLE_WINDOWS.md) utilise les machines macOS de GitHub Actions. Le nom légal exact et les accès de signature ne sont pas encore fournis. Ce choix ne détermine pas le type du compte Google Play. [Inscription Apple](https://developer.apple.com/programs/enroll/).
 
 ## 1. Choisir la distribution
 
@@ -140,4 +142,4 @@ Joindre les étapes exactes de connexion et le parcours des fonctions natives, l
 - [ ] Questionnaires de contenu, âge, confidentialité, chiffrement Apple et fonctionnalités financières Google complétés selon le binaire.
 - [ ] Soumission manuelle revue par le titulaire, puis suivi des retours Apple/Google ; publication seulement après leur approbation.
 
-À ce stade, **les comptes et signatures ne sont pas disponibles**. La documentation, les projets natifs et les builds de contrôle peuvent être préparés ; aucune installation via un store public ne peut être annoncée avant signature, soumission et approbation.
+À ce stade, **le titulaire confirme son compte Apple individuel activé ; les identifiants et fichiers de signature ne sont pas encore disponibles dans le projet**. Le compte Google reste à confirmer. Aucune installation via un store public ne peut être annoncée avant signature, soumission et approbation.

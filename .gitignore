@@ -10,6 +10,7 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 *.log
+__pycache__/
 mobile/android/.gradle/
 mobile/android/.kotlin/
 mobile/android/**/build/
@@ -24,6 +25,9 @@ mobile/ios/.build/
 *.keystore
 *.jks
 *.p12
+*.p8
+*.key
+*.certSigningRequest
 *.mobileprovision
 *.ipa
 *.apk

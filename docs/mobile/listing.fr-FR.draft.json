@@ -13,7 +13,10 @@
     "public_pages_status": "pending_deployment_and_publisher_completion",
     "account_deletion_url": null,
     "copyright": null,
-    "apple_developer_account_available": false,
+    "apple_enrollment_type": "individual",
+    "apple_enrollment_type_confirmed_at": "2026-09-26",
+    "apple_developer_account_available": true,
+    "apple_developer_account_status_source": "owner_confirmed_2026-09-26_not_api_verified",
     "google_play_account_available": false
   },
   "application": {
@@ -40,7 +43,8 @@
     "promotional_text": "Retrouvez les encaissements, dépenses, justificatifs et reçus de votre entreprise dans une interface conçue pour le travail quotidien.",
     "minimum_submission_xcode": 26,
     "minimum_submission_sdk": 26,
-    "team_id": null,
+    "team_id": "KDHSLMD5LF",
+    "team_id_confirmed_at": "2026-09-26",
     "app_store_connect_id": null,
     "age_rating": null
   },

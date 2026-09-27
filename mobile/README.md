@@ -20,7 +20,7 @@ Les artefacts attendus sont un APK Android de développement installable pour es
 
 L’APK de développement se connecte au service réel : utiliser un compte et une entreprise de test pour toute saisie. Ne jamais exécuter le scénario de recette financière dans les données métier d’une entreprise réelle.
 
-Les clés Android, certificats Apple, profils et fichiers de signature doivent rester hors Git. Les comptes développeur ne sont pas encore créés. Le dossier [publication boutiques](../docs/mobile/STORES.md) décrit les démarches restantes, les déclarations de confidentialité et la recette sur appareils. L’acceptation appartient aux boutiques.
+Les clés Android, certificats Apple, profils et fichiers de signature doivent rester hors Git. Le titulaire confirme le 26 septembre 2026 son compte Apple Developer individuel activé ; le compte Google reste à confirmer. Le [parcours Apple depuis Windows](../docs/mobile/APPLE_WINDOWS.md) prépare la signature et l’envoi manuel TestFlight sur GitHub macOS. Le dossier [publication boutiques](../docs/mobile/STORES.md) décrit les démarches restantes, les déclarations de confidentialité et la recette sur appareils. L’acceptation appartient aux boutiques.
 
 ## Icônes
 
