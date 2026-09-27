@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CircleHelp, FileText, KeyRound, Mail, UserRound } from "lucide-react";
 import { InfoSection, PublicInfo, SUPPORT_EMAIL, SupportLink } from "@/components/public-info";
+import { APP_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Assistance",
-  description:
-    "Contacter le support Orange Finance, retrouver son accès et demander de l’aide pour son compte professionnel.",
+  description: `Contacter le support ${APP_NAME}, retrouver son accès et demander de l’aide.`,
 };
 
 export default function AssistancePage() {
@@ -28,14 +28,15 @@ export default function AssistancePage() {
           <strong>Ne transmettez pas votre mot de passe.</strong> Masquez les informations de tiers
           dans les captures et évitez de joindre des documents financiers au premier message.
         </p>
-        <SupportLink subject="Orange Finance — demande d’assistance">Écrire au support</SupportLink>
+        <SupportLink subject={`${APP_NAME} — demande d’assistance`}>Écrire au support</SupportLink>
       </InfoSection>
 
       <InfoSection title="Retrouver mon accès" icon={<KeyRound size={21} />}>
         <p>
-          Votre compte est créé par l’administrateur de votre entreprise. Contactez-le si vous ne
-          possédez pas encore de compte, si votre accès a été désactivé ou si une fonction ne vous
-          est pas autorisée.
+          Vous pouvez <Link href="/inscription">créer gratuitement votre compte</Link> pour votre
+          entreprise, vos finances personnelles ou les deux. Pour rejoindre une équipe existante,
+          demandez une invitation à son propriétaire. Contactez-le si votre accès professionnel a
+          été désactivé.
         </p>
         <p>
           Vous pouvez utiliser <Link href="/forgot-password">Mot de passe oublié</Link>. La
@@ -85,7 +86,7 @@ export default function AssistancePage() {
         <p>
           <Link href="/confidentialite">Consulter les informations de confidentialité</Link>.
         </p>
-        <SupportLink subject="Orange Finance — demande concernant mon compte ou mes données">
+        <SupportLink subject={`${APP_NAME} — demande concernant mon compte ou mes données`}>
           Envoyer une demande
         </SupportLink>
       </InfoSection>

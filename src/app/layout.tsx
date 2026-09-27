@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { THEME_COLORS, themeInitializationScript } from "@/lib/theme";
+import { APP_NAME, APP_BRAND_NAME } from "@/lib/brand";
 import "./globals.css";
 import "./themes.css";
 import "./mobile-navigation.css";
+import "./workspaces.css";
 
 export const metadata: Metadata = {
-  title: { default: "Orange · Gestion d’entreprise", template: "%s · Orange" },
+  title: {
+    default: `${APP_BRAND_NAME} · Finances professionnelles et personnelles`,
+    template: `%s · ${APP_BRAND_NAME}`,
+  },
   description: "Votre activité, vos équipes et votre trésorerie, au même endroit.",
-  applicationName: "Orange Finance",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "Orange" },
+  applicationName: APP_NAME,
+  appleWebApp: { capable: true, statusBarStyle: "default", title: APP_BRAND_NAME },
   icons: {
     icon: "/icon.svg",
     apple: { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },

@@ -7,7 +7,7 @@ import { reportPeriod } from "./report.service";
 import { makeDocument } from "./pdf.service";
 import { audit } from "./audit.service";
 import { filters, search } from "./directory-read.service";
-import { publicUserSelect } from "@/lib/user-select";
+import { companyUserSelect } from "@/lib/user-select";
 import { uuid } from "@/lib/validation";
 import { transactionSearch } from "./daybook.service";
 
@@ -113,7 +113,10 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
             take,
           }),
           db.cashAccount.findMany({ where: { companyId }, select: { id: true, name: true } }),
-          db.user.findMany({ where: { companyId }, select: { id: true, name: true } }),
+          db.user.findMany({
+            where: { memberships: { some: { companyId } } },
+            select: { id: true, name: true },
+          }),
         ]);
         const cash = new Map(accounts.map((a) => [a.id, a.name])),
           people = new Map(users.map((u) => [u.id, u.name]));
@@ -359,8 +362,8 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
             })
           : await db.user.findMany({
               where: {
-                companyId,
-                salesperson: { isNot: null },
+                memberships: { some: { companyId } },
+                salesperson: { some: { companyId } },
                 ...(actor.role === "SALESPERSON" ? { id: actor.id } : {}),
                 ...search(params, ["name", "email"]),
               },
@@ -470,8 +473,8 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
         headers = ["Nom", "Email", "Rôles", "Statut", "Créé le"];
         rows = (
           await db.user.findMany({
-            where: { companyId, ...search(params, ["name", "email"]) },
-            select: publicUserSelect,
+            where: { memberships: { some: { companyId } }, ...search(params, ["name", "email"]) },
+            select: companyUserSelect(companyId),
             orderBy: { name: "asc" },
             take,
           })
@@ -479,7 +482,7 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
           item.name,
           item.email,
           item.roles.map((role) => role.role.label).join(", "),
-          item.active ? "Actif" : "Désactivé",
+          item.active && item.memberships[0]?.active ? "Actif" : "Désactivé",
           day(item.createdAt),
         ]);
       } else if (type === "audit") {

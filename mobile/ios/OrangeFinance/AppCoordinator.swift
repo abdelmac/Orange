@@ -31,6 +31,7 @@ final class AppCoordinator: NSObject, WKHTTPCookieStoreObserver, UITabBarControl
         pdfs.sessionExpired = { [weak self] in self?.sessionLost() }
         entry.onPDF = { [weak self] url, presenter in self?.downloadPDF(url, from: presenter) }
         entry.onRecord = { [weak self] path in self?.openPage("Justificatif", path: path) }
+        entry.onPersonal = { [weak self] path in self?.openPage("Finances personnelles", path: path) }
         more.openPage = { [weak self] title, path in self?.openPage(title, path: path) }
         more.logout = { [weak self] in self?.confirmLogout() }
         dataStore.httpCookieStore.add(self)
@@ -78,7 +79,13 @@ final class AppCoordinator: NSObject, WKHTTPCookieStoreObserver, UITabBarControl
         // In particular, checking the journal after an uncertain response must fetch
         // the current ledger, not display the page loaded before the attempted write.
         if tabBarController.selectedIndex == 0 { home.load(path: "/") }
-        if tabBarController.selectedIndex == 2 { journal.load(path: "/journal") }
+        if tabBarController.selectedIndex == 2 {
+            Task { [weak self] in
+                guard let self else { return }
+                let context: SessionContext? = try? await self.bridge.request("/api/me")
+                self.journal.load(path: context?.isPersonal == true ? "/personal/transactions" : "/journal")
+            }
+        }
         verifySession()
     }
 

@@ -50,7 +50,7 @@ function receiptScope(actor: Actor): Prisma.FinancialTransactionWhereInput {
     type: { in: ["EXPENSE", "REVERSAL"] },
     expense: { requesterId: actor.id, companyId: actor.companyId },
   };
-  if (actor.role === "EMPLOYEE") {
+  if (["EMPLOYEE", "MEMBER"].includes(actor.role)) {
     requirePermission(actor, "expenses.view");
     return ownExpense;
   }
@@ -105,7 +105,7 @@ async function snapshotFor(
     }),
     tx.user.findMany({
       where: {
-        companyId,
+        memberships: { some: { companyId } },
         id: { in: ids([movement.sourceSalespersonId, movement.destinationSalespersonId]) },
       },
       select: { id: true, name: true },

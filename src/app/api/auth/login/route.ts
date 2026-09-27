@@ -16,8 +16,8 @@ export async function POST(request: Request) {
       })
       .parse(await readJson(request));
     await consumeAuthAttempt(input.email, "login");
-    const { token, expiresAt } = await authenticate(input.email, input.password);
-    const response = json({ ok: true });
+    const { token, expiresAt, redirectTo } = await authenticate(input.email, input.password);
+    const response = json({ ok: true, redirectTo });
     response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(expiresAt));
     return response;
   });

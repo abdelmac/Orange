@@ -27,17 +27,28 @@ enum OriginPolicy {
 
     static func allowsPDF(_ url: URL?) -> Bool {
         guard let url, isTrusted(url), url.fragment == nil else { return false }
+        if isPrivateAttachment(url) { return true }
         let path = url.path.split(separator: "/").map(String.init)
         if path.count == 4 && path[0] == "api" && UUID(uuidString: path[2]) != nil {
             return (path[1] == "transactions" && path[3] == "receipt") || (path[1] == "invoices" && path[3] == "pdf")
         }
-        if path.count == 3 && path[0] == "api" && path[1] == "attachments" { return UUID(uuidString: path[2]) != nil }
         let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
         if url.path == "/api/receipts" {
             return query.contains { $0.name == "entity" && ["transaction", "payment", "expense"].contains($0.value ?? "") }
                 && query.contains { $0.name == "id" && UUID(uuidString: $0.value ?? "") != nil }
         }
         return url.path == "/api/exports" && query.contains { $0.name == "format" && $0.value == "pdf" }
+    }
+
+    static func isPrivateAttachment(_ url: URL?) -> Bool {
+        guard let url, isTrusted(url), url.fragment == nil,
+              let parts = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              parts.percentEncodedPath == url.path else { return false }
+        let id = url.lastPathComponent
+        guard UUID(uuidString: id) != nil,
+              url.path == "/api/attachments/\(id)" || url.path == "/api/personal/attachments/\(id)" else { return false }
+        let query = parts.queryItems ?? []
+        return query.isEmpty || (query.count == 1 && query[0].name == "inline" && query[0].value == "1")
     }
 
     static func isExternalUserLink(_ url: URL) -> Bool {

@@ -58,7 +58,7 @@ async function dashboardSnapshot(
     hasPermission(actor, "cash.view") &&
     hasPermission(actor, "salespeople.view") &&
     actor.role !== "CASHIER" &&
-    actor.role !== "EMPLOYEE";
+    !["EMPLOYEE", "MEMBER"].includes(actor.role);
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   const tomorrow = new Date(+today + 86_400_000);
@@ -203,8 +203,8 @@ async function dashboardSnapshot(
     canHeld
       ? db.user.findMany({
           where: {
-            companyId,
-            salesperson: { isNot: null },
+            memberships: { some: { companyId } },
+            salesperson: { some: { companyId } },
             ...(commercial ? { id: actor.id } : {}),
           },
           select: { id: true, name: true },

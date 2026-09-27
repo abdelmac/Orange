@@ -67,7 +67,7 @@ class PrivateDocuments(
                     "image/webp" -> "webp"
                     else -> throw IllegalStateException("Type de document non autorisé.")
                 }
-                if (!URL(url).path.startsWith("/api/attachments/")) check(mime == "application/pdf") { "Le serveur n’a pas renvoyé un PDF." }
+                if (!AppPolicy.isPrivateAttachment(url)) check(mime == "application/pdf") { "Le serveur n’a pas renvoyé un PDF." }
                 check(connection.contentLengthLong <= AppPolicy.MAX_DOCUMENT_BYTES) { "Ce document dépasse 20 Mo." }
                 val folder = File(context.cacheDir, "receipts").also { it.mkdirs() }
                 val target = File(folder, "orange-${UUID.randomUUID()}.$extension")

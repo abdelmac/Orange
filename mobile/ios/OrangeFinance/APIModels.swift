@@ -1,12 +1,14 @@
 import Foundation
 
 struct SessionContext: Decodable {
-    struct User: Decodable { let id: String; let name: String; let role: String; let cashAccountIds: [String]? }
+    struct User: Decodable { let id: String; let name: String; let role: String; let cashAccountIds: [String]?; let usageType: String?; let personalCurrency: String? }
     struct Company: Decodable { let id: String; let name: String; let currency: String }
     let user: User
-    let company: Company
+    let company: Company?
+    let workspace: String?
     let permissions: [String]
     func can(_ permission: String) -> Bool { permissions.contains(permission) }
+    var isPersonal: Bool { company == nil || workspace == "PERSONAL" }
 }
 
 struct CashAccount: Decodable {

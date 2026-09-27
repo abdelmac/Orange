@@ -24,6 +24,7 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
 
     private static func configuration(store: WKWebsiteDataStore) -> WKWebViewConfiguration {
         let config = WKWebViewConfiguration()
+        config.applicationNameForUserAgent = "OrangeFinanceNative/1.0"
         config.websiteDataStore = store
         config.preferences.javaScriptCanOpenWindowsAutomatically = false
         // Presentation only: the native tab bar replaces this existing mobile navigation.
@@ -32,7 +33,7 @@ final class BrowserController: UIViewController, WKNavigationDelegate, WKUIDeleg
         (() => {
           if (window.location.origin !== 'https://orange-finance.onrender.com') return;
           const style = document.createElement('style');
-          style.textContent = '.mobile-bottom-nav { display: none !important; }';
+          style.textContent = '.mobile-bottom-nav[data-workspace="BUSINESS"] { display: none !important; }';
           document.head.appendChild(style);
         })();
         """

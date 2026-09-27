@@ -1,21 +1,31 @@
-import { getActor } from "@/lib/auth";
+import { getActor, getIdentity } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { withApi } from "@/lib/http";
 
 export async function GET(request: Request) {
   return withApi(async () => {
-    const actor = await getActor(request);
-    const [user, company] = await Promise.all([
-      db.user.findFirstOrThrow({
-        where: { id: actor.id, companyId: actor.companyId },
-        select: { id: true, name: true, email: true, active: true },
-      }),
-      db.company.findUniqueOrThrow({ where: { id: actor.companyId } }),
-    ]);
+    const identity = await getIdentity(request);
+    const member = identity.memberships.find((item) => item.companyId === identity.companyId);
+    const actor = member ? await getActor(request) : null;
+    const company = actor
+      ? await db.company.findUniqueOrThrow({ where: { id: actor.companyId } })
+      : null;
     return {
-      user: { ...user, role: actor.role, cashAccountIds: actor.cashAccountIds },
+      user: {
+        id: identity.id,
+        name: identity.name,
+        email: identity.email,
+        active: identity.active,
+        usageType: identity.usageType,
+        personalCurrency: identity.personalCurrency,
+        role: actor?.role ?? "PERSONAL",
+        isOwner: member?.isOwner ?? false,
+        cashAccountIds: actor?.cashAccountIds ?? [],
+      },
       company,
-      permissions: actor.permissions,
+      permissions: actor?.permissions ?? [],
+      memberships: identity.memberships,
+      workspace: actor ? "BUSINESS" : "PERSONAL",
     };
   });
 }

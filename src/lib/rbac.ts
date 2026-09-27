@@ -46,6 +46,9 @@ export const permissionDefinitions = [
 ] as const;
 
 export const roleLabels: Record<string, string> = {
+  OWNER: "Propriétaire",
+  MEMBER: "Membre",
+  VIEWER: "Lecture seule",
   ADMIN: "Administrateur",
   MANAGER: "Responsable",
   ACCOUNTANT: "Comptable",
@@ -55,6 +58,18 @@ export const roleLabels: Record<string, string> = {
 };
 
 export const rolePermissions: Record<string, string[]> = {
+  OWNER: [...permissionDefinitions],
+  MEMBER: [
+    "dashboard.view",
+    "expenses.view",
+    "expenses.create",
+    "expenses.edit",
+    "attachments.create",
+  ],
+  VIEWER: permissionDefinitions.filter(
+    (permission) =>
+      permission.endsWith(".view") && !["users.view", "audit.view"].includes(permission),
+  ),
   ADMIN: [...permissionDefinitions],
   MANAGER: [
     "dashboard.view",
@@ -164,7 +179,19 @@ export function assertPermission(actor: Pick<Actor, "permissions">, permission: 
 }
 
 export function isOwnScope(actor: Pick<Actor, "role">) {
-  return actor.role === "SALESPERSON" || actor.role === "EMPLOYEE";
+  return actor.role === "SALESPERSON" || actor.role === "EMPLOYEE" || actor.role === "MEMBER";
+}
+
+export function resolvePermissions(
+  base: readonly string[],
+  overrides: readonly { permissionKey: string; allowed: boolean }[],
+) {
+  const result = new Set(base);
+  for (const override of overrides) {
+    if (override.allowed) result.add(override.permissionKey);
+    else result.delete(override.permissionKey);
+  }
+  return [...result];
 }
 
 export function clientScope(actor: Actor) {

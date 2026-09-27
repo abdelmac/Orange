@@ -5,6 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { db } from "../src/lib/db";
 import { hashPassword } from "../src/lib/password";
 import { roleLabels, rolePermissions } from "../src/lib/rbac";
+import { ensurePlan } from "../src/services/entitlement.service";
 
 loadEnvConfig(process.cwd());
 const base = process.env.E2E_BASE_URL ?? "http://localhost:3000";
@@ -62,6 +63,10 @@ async function main() {
     data: { name: `Validation HTTP ${runId}`, currency: "EUR" },
   });
   const roleIds: Record<string, string> = {};
+  const legacyPlan = await ensurePlan("LEGACY");
+  await db.subscription.create({
+    data: { companyId: company.id, planId: legacyPlan.id, status: "FREE" },
+  });
   for (const [name, keys] of Object.entries(rolePermissions)) {
     const role = await db.role.create({
       data: { companyId: company.id, name, label: roleLabels[name] },
@@ -85,7 +90,7 @@ async function main() {
       name: "Administrateur validation",
       email: adminEmail,
       passwordHash: await hashPassword(password),
-      roles: { create: { roleId: roleIds.ADMIN } },
+      roles: { create: { companyId: company.id, roleId: roleIds.ADMIN } },
     },
   });
   const admin = await login(adminEmail);

@@ -71,8 +71,8 @@ export async function GET(request: Request) {
       hasPermission(actor, "salespeople.view")
         ? db.user.findMany({
             where: {
-              companyId,
-              salesperson: { isNot: null },
+              memberships: { some: { companyId, active: true } },
+              salesperson: { some: { companyId } },
               ...(actor.role === "SALESPERSON" ? { id: actor.id } : {}),
               name: contains,
             },

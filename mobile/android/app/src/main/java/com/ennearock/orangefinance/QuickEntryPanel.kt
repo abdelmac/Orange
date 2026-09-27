@@ -22,6 +22,7 @@ class QuickEntryState : ViewModel() {
     var method = 0
     var cashId = ""
     var userId = ""
+    var companyId = ""
     var currency = ""
     var result: JSONObject? = null
     var submitting = false
@@ -31,7 +32,7 @@ class QuickEntryState : ViewModel() {
         amount = ""; name = ""; description = ""; phone = ""; kind = 0
         result = null; submitting = false; requestBody = null
     }
-    fun clearSession() { newEntry(); userId = ""; cashId = ""; method = 0; currency = "" }
+    fun clearSession() { newEntry(); userId = ""; companyId = ""; cashId = ""; method = 0; currency = "" }
 }
 
 /** Native form; only the authenticated, same-origin WebView performs API requests. */
@@ -83,9 +84,28 @@ class QuickEntryPanel(
             val data = response.json()
             user = data.optJSONObject("user")
             val userId = user?.optString("id").orEmpty()
+            val company = data.optJSONObject("company")
+            val companyId = company?.optString("id").orEmpty()
+            if (state.requestBody != null && state.companyId != companyId) {
+                column.removeAllViews()
+                text("L’espace a changé depuis votre dernière tentative. Revenez à l’entreprise précédente et vérifiez son journal avant de poursuivre.", 16f)
+                button("Choisir mon espace") { navigate("/onboarding") }
+                return@request
+            }
             if (state.userId.isNotEmpty() && state.userId != userId) state.clearSession()
+            if (state.companyId != companyId) state.clearSession()
             state.userId = userId
-            state.currency = data.optJSONObject("company")?.optString("currency").orEmpty()
+            state.companyId = companyId
+            if (company == null || data.optString("workspace") == "PERSONAL") {
+                column.removeAllViews()
+                text("Mes finances personnelles", 28f, true)
+                text("Ces opérations restent privées et séparées de votre entreprise.", 16f)
+                button("Ajouter un revenu personnel") { navigate("/personal/revenus") }
+                button("Ajouter une dépense personnelle") { navigate("/personal/depenses") }
+                button("Mes comptes et budgets") { navigate("/personal") }
+                return@request
+            }
+            state.currency = company.optString("currency")
             if (!state.currency.matches(Regex("[A-Z]{3}"))) {
                 column.removeView(progress)
                 text("La devise de l’entreprise n’est pas configurée. Contactez votre administrateur.", 16f)

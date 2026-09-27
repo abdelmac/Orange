@@ -65,6 +65,13 @@ export async function assertCompany(
   companyId: string,
 ) {
   idInput.parse(id);
+  if (model === "user") {
+    const membership = await tx.companyMembership.findFirst({
+      where: { companyId, userId: id, active: true, user: { active: true } },
+    });
+    if (!membership) throw new BusinessError("Utilisateur introuvable.", 404);
+    return { id: membership.userId };
+  }
   // A fixed allowlist prevents arbitrary delegate access; each lookup always includes the tenant.
   const delegates = {
     client: tx.client,
@@ -113,7 +120,11 @@ export async function assertCashAccess(
 
 export async function assertSalesperson(tx: Tx, actor: Actor, id: string) {
   const profile = await tx.salespersonProfile.findFirst({
-    where: { companyId: actor.companyId, userId: idInput.parse(id), user: { active: true } },
+    where: {
+      companyId: actor.companyId,
+      userId: idInput.parse(id),
+      user: { active: true, memberships: { some: { companyId: actor.companyId, active: true } } },
+    },
   });
   if (!profile || (actor.role === "SALESPERSON" && id !== actor.id))
     throw new BusinessError("Commercial introuvable.", 404);

@@ -215,7 +215,7 @@ function Collection({ module, config }: { module: string; config: ModuleConfig }
           config.create &&
           (module !== "depenses" ||
             (["PENDING", "DRAFT"].includes(value(r, "status")) &&
-              (r.requesterId === user.id || user.role === "ADMIN"))) && (
+              (r.requesterId === user.id || ["OWNER", "ADMIN"].includes(String(user.role))))) && (
             <button
               className="icon-button"
               title="Modifier"
@@ -265,7 +265,7 @@ function Collection({ module, config }: { module: string; config: ModuleConfig }
           <>
             {r.status === "PENDING" &&
               can("expenses.validate") &&
-              (r.requesterId !== user.id || user.role === "ADMIN") && (
+              (r.requesterId !== user.id || ["OWNER", "ADMIN"].includes(String(user.role))) && (
                 <button
                   className="row-action-button green"
                   onClick={() => {
@@ -279,7 +279,7 @@ function Collection({ module, config }: { module: string; config: ModuleConfig }
               )}
             {r.status === "PENDING" &&
               can("expenses.reject") &&
-              (r.requesterId !== user.id || user.role === "ADMIN") && (
+              (r.requesterId !== user.id || ["OWNER", "ADMIN"].includes(String(user.role))) && (
                 <button
                   className="icon-button danger"
                   title="Refuser"

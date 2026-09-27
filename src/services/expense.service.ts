@@ -100,7 +100,7 @@ async function reviewExpense(actor: Actor, raw: unknown, status: "APPROVED" | "R
     if (!expense) throw new BusinessError("Dépense introuvable.", 404);
     if (expense.status !== "PENDING")
       throw new BusinessError("Seules les dépenses en attente peuvent être examinées.", 409);
-    if (expense.requesterId === actor.id && actor.role !== "ADMIN")
+    if (expense.requesterId === actor.id && !["OWNER", "ADMIN"].includes(actor.role))
       throw new BusinessError("Une autre personne doit examiner votre demande.", 403);
     const updated = await tx.expense.update({
       where: { id: expense.id },

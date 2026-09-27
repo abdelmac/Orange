@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { APP_NAME, APP_BRAND_NAME } from "@/lib/brand";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Orange — Gestion financière",
-    short_name: "Orange",
-    description: "Gestion financière et commerciale de votre entreprise",
+    name: APP_NAME,
+    short_name: APP_BRAND_NAME,
+    description: "Finances professionnelles et personnelles dans des espaces séparés",
     id: "/",
     start_url: "/",
     scope: "/",

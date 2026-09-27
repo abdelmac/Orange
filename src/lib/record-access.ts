@@ -32,14 +32,16 @@ export function transactionScope(actor: Actor): Prisma.FinancialTransactionWhere
       { sourceCashAccountId: { in: actor.cashAccountIds ?? [] } },
       { destinationCashAccountId: { in: actor.cashAccountIds ?? [] } },
     ];
-  if (actor.role === "EMPLOYEE") where.createdById = actor.id;
+  if (["EMPLOYEE", "MEMBER"].includes(actor.role)) where.createdById = actor.id;
   return where;
 }
 
 export function expenseScope(actor: Actor): Prisma.ExpenseWhereInput {
   return {
     companyId: actor.companyId,
-    ...(["SALESPERSON", "EMPLOYEE"].includes(actor.role) ? { requesterId: actor.id } : {}),
+    ...(["SALESPERSON", "EMPLOYEE", "MEMBER"].includes(actor.role)
+      ? { requesterId: actor.id }
+      : {}),
     ...(actor.role === "CASHIER"
       ? {
           OR: [

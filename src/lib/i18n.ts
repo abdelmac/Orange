@@ -3,6 +3,10 @@ export type Locale = (typeof locales)[number];
 export const localeDirection = (locale: Locale) => (locale === "ar" ? "rtl" : "ltr");
 export const labels: Record<string, string> = {
   ADMIN: "Administrateur",
+  OWNER: "Propriétaire",
+  MEMBER: "Membre",
+  VIEWER: "Lecture seule",
+  PERSONAL: "Espace personnel",
   MANAGER: "Responsable",
   ACCOUNTANT: "Comptable",
   CASHIER: "Caissier",

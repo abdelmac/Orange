@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         content.addView(webView, FrameLayout.LayoutParams(-1, -1))
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         webView.settings.apply {
+            userAgentString = "$userAgentString OrangeFinanceNative/1.0"
             javaScriptEnabled = true
             domStorageEnabled = true
             allowFileAccess = false
@@ -116,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                       if (document.getElementById('orange-native-navigation')) return;
                       const style = document.createElement('style');
                       style.id = 'orange-native-navigation';
-                      style.textContent = '.mobile-bottom-nav { display: none !important; }';
+                      style.textContent = '.mobile-bottom-nav[data-workspace="BUSINESS"] { display: none !important; }';
                       document.head.appendChild(style);
                     })();
                 """.trimIndent(), null)
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         webView.setDownloadListener { url, _, _, _, _ -> shareDocument(url) }
         navButton("Accueil") { navigate("/") }
         navButton("Encaisser") { showQuickEntry() }
-        navButton("Journal") { navigate("/journal") }
+        navButton("Journal") { showJournal() }
         navButton("Plus") { showMore() }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -200,9 +201,21 @@ class MainActivity : AppCompatActivity() {
         bridge.request("GET", "/api/me") { response ->
             if (response.status == 401) { login(); return@request }
             if (!response.successful) { message(response.error()); return@request }
-            val array = response.json().optJSONArray("permissions")
+            val data = response.json()
+            val array = data.optJSONArray("permissions")
             val permissions = if (array == null) emptySet() else (0 until array.length()).map { array.getString(it) }.toSet()
-            val modules = listOf(
+            val personal = data.optJSONObject("company") == null || data.optString("workspace") == "PERSONAL"
+            val modules = (if (personal) listOf(
+                Triple("Mes finances personnelles", "/personal", ""),
+                Triple("Ajouter une dépense", "/personal/depenses", ""),
+                Triple("Ajouter un revenu", "/personal/revenus", ""),
+                Triple("Transactions", "/personal/transactions", ""),
+                Triple("Budgets", "/personal/budgets", ""),
+                Triple("Comptes", "/personal/comptes", ""),
+                Triple("Catégories", "/personal/categories", ""),
+                Triple("Statistiques", "/personal/statistiques", ""),
+                Triple("Paramètres", "/personal/parametres", ""),
+            ) else listOf(
                 Triple("Dépenses", "/depenses", "expenses.view"),
                 Triple("Demander une dépense", "/saisie?direction=OUT", "expenses.create"),
                 Triple("Factures", "/factures", "invoices.view"),
@@ -212,12 +225,22 @@ class MainActivity : AppCompatActivity() {
                 Triple("Transactions", "/transactions", "transactions.view"),
                 Triple("Rapports", "/rapports", "reports.view"),
                 Triple("Paramètres", "/parametres", "dashboard.view"),
-            ).filter { it.third in permissions }
+            )).filter { it.third.isEmpty() || it.third in permissions } + Triple("Mes espaces et mon profil", "/onboarding", "")
             val labels = modules.map { it.first } + "Se déconnecter"
             AlertDialog.Builder(this).setTitle("Orange Finance")
                 .setItems(labels.toTypedArray()) { _, index ->
                     if (index < modules.size) navigate(modules[index].second) else confirmLogout()
                 }.setNegativeButton("Fermer", null).show()
+        }
+    }
+
+    private fun showJournal() {
+        if (!ready) { message("Attendez la fin du chargement."); return }
+        bridge.request("GET", "/api/me") { response ->
+            if (response.status == 401) { login(); return@request }
+            if (!response.successful) { message(response.error()); return@request }
+            val data = response.json()
+            navigate(if (data.optJSONObject("company") == null || data.optString("workspace") == "PERSONAL") "/personal/transactions" else "/journal")
         }
     }
 

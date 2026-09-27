@@ -14,15 +14,17 @@ export async function POST(request: Request) {
     await db.$transaction(async (tx) => {
       const reset = await tx.passwordResetToken.findUnique({
         where: { tokenHash: tokenHash(input.token) },
-        include: { user: { select: { active: true, companyId: true, name: true } } },
+        include: {
+          user: {
+            select: {
+              active: true,
+              name: true,
+              memberships: { where: { active: true }, select: { companyId: true } },
+            },
+          },
+        },
       });
-      if (
-        !reset ||
-        reset.usedAt ||
-        reset.expiresAt <= new Date() ||
-        !reset.user.active ||
-        reset.companyId !== reset.user.companyId
-      )
+      if (!reset || reset.usedAt || reset.expiresAt <= new Date() || !reset.user.active)
         throw new HttpError(400, "Le lien est expiré ou déjà utilisé. Demandez un nouveau lien.");
       const claimed = await tx.passwordResetToken.updateMany({
         where: { id: reset.id, usedAt: null, expiresAt: { gt: new Date() } },
@@ -35,16 +37,16 @@ export async function POST(request: Request) {
         where: { userId: reset.userId, usedAt: null },
         data: { usedAt: new Date() },
       });
-      await tx.auditLog.create({
-        data: {
-          companyId: reset.companyId,
+      await tx.auditLog.createMany({
+        data: reset.user.memberships.map((membership) => ({
+          companyId: membership.companyId,
           userId: reset.userId,
           userName: reset.user.name,
           action: "PASSWORD_RESET",
           entity: "User",
           entityId: reset.userId,
           after: { passwordChanged: true },
-        },
+        })),
       });
     });
     return { ok: true, message: "Mot de passe modifié. Vous pouvez vous connecter." };

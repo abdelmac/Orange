@@ -6,6 +6,7 @@ import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, ShieldCheck } from "lucide
 import { Brand } from "./app-shell";
 import { post } from "./api";
 import { ThemePicker } from "./theme-picker";
+import { APP_NAME } from "@/lib/brand";
 
 const subscribeHydration = () => () => {};
 
@@ -43,8 +44,9 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
     const data = Object.fromEntries(new FormData(e.currentTarget));
     try {
       if (mode === "login") {
-        await post("/api/auth/login", data);
-        router.push("/");
+        const result = await post<{ redirectTo: string }>("/api/auth/login", data);
+        const next = new URLSearchParams(window.location.search).get("next");
+        router.push(next?.startsWith("/invitation?") ? next : result.redirectTo || "/");
         router.refresh();
       } else if (mode === "forgot") {
         await post("/api/auth/forgot-password", data);
@@ -194,8 +196,13 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
             </Link>
           )}
           <div className="auth-security">
-            <ShieldCheck size={15} /> Connexion sécurisée · Accès réservé à votre équipe
+            <ShieldCheck size={15} /> Connexion sécurisée · Vos données restent privées
           </div>
+          {mode === "login" && (
+            <Link className="back-login" href="/inscription">
+              Créer un compte gratuit
+            </Link>
+          )}
           <nav
             aria-label="Aide et confidentialité"
             style={{
@@ -216,7 +223,7 @@ export function AuthForm({ mode = "login" }: { mode?: "login" | "forgot" | "rese
           </nav>
         </div>
         <div className="auth-copyright">
-          Orange © {new Date().getFullYear()} · La clarté fait la différence.
+          {APP_NAME} © {new Date().getFullYear()} · La clarté fait la différence.
         </div>
       </main>
     </div>

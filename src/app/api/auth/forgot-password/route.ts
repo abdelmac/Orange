@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { consumeAuthAttempt, tokenHash } from "@/lib/auth";
 import { assertSameOrigin, readJson, withApi } from "@/lib/http";
+import { APP_NAME } from "@/lib/brand";
 
 export async function POST(request: Request) {
   return withApi(async () => {
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
       await transport.sendMail({
         from: process.env.SMTP_FROM,
         to: user.email,
-        subject: "Orange — Réinitialiser votre mot de passe",
+        subject: `${APP_NAME} — Réinitialiser votre mot de passe`,
         text: `Vous avez demandé un nouveau mot de passe. Ce lien est valable 30 minutes et utilisable une seule fois : ${url.toString()}\n\nSi vous n’êtes pas à l’origine de cette demande, ignorez cet email.`,
       });
     } catch {

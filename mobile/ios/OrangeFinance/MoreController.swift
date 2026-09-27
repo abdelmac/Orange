@@ -29,9 +29,16 @@ final class MoreController: UITableViewController {
             do {
                 let context: SessionContext = try await bridge.request("/api/me")
                 guard generation == started else { return }
-                rows = destinations.filter { $0.2.isEmpty || context.can($0.2) }.map { ($0.0, $0.1) }
+                rows = context.isPersonal ? [
+                    ("Mes finances personnelles", "/personal"), ("Ajouter une dépense", "/personal/depenses"),
+                    ("Ajouter un revenu", "/personal/revenus"), ("Transactions", "/personal/transactions"),
+                    ("Budgets", "/personal/budgets"), ("Comptes", "/personal/comptes"),
+                    ("Catégories", "/personal/categories"), ("Statistiques", "/personal/statistiques"),
+                    ("Paramètres", "/personal/parametres")
+                ] : destinations.filter { $0.2.isEmpty || context.can($0.2) }.map { ($0.0, $0.1) }
+                rows.append(("Mes espaces et mon profil", "/onboarding"))
                 rows.append(("Déconnexion", "logout"))
-                navigationItem.prompt = context.company.name
+                navigationItem.prompt = context.company?.name ?? "Finances personnelles"
             } catch { rows = [("Se connecter depuis l’accueil", "login")]; navigationItem.prompt = nil }
             tableView.reloadData()
         }

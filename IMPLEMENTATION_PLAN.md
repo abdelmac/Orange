@@ -1,6 +1,29 @@
 # Orange — plan d’implémentation
 
+## Évolution FREE / PRO et finances personnelles — 27 septembre 2026
+
+Inspection : Next.js App Router, sessions PostgreSQL avec cookie HttpOnly, utilisateur actuellement rattaché à une seule entreprise, RBAC par rôle/permission, registre financier en unités mineures immuable, factures émises avec les ventes et PDF pdf-lib. Réutiliser ces modules et conserver leurs routes métier.
+
+1. Étendre le schéma et créer une migration conservatrice : usage BUSINESS par défaut pour les utilisateurs existants ; adhésions multi-entreprises sans déplacer les comptes ; abonnements/plans ; invitations ; réglages et instantanés de facture ; comptes, catégories, transactions, budgets et fichiers personnels liés directement au User.
+2. Centraliser FREE / PRO (400 centimes EUR par mois), fonctions et quotas côté serveur. Les nouvelles inscriptions démarrent FREE sans carte ; les entreprises existantes conservent les fonctions déjà disponibles dans un plan interne LEGACY non commercialisé. Les données ne sont jamais supprimées lors d’un déclassement.
+3. Implémenter Stripe Checkout/portail/annulation/réactivation et webhooks signés/idempotents. Les événements font relire l’abonnement actuel chez Stripe pour éviter les retours en arrière dus à l’ordre de livraison. Sans clés Stripe configurées, FREE reste utilisable ; aucune activation PRO depuis le navigateur.
+4. Personnaliser les factures PRO avec une configuration validée, logo privé, modèles/couleurs/champs, aperçu PDF identique au téléchargement/à l’impression, numérotation sans remise à zéro et instantané des nouvelles factures. Les documents déjà émis restent inchangés.
+5. Ajouter inscription/onboarding BUSINESS/PERSONAL/BOTH, adhésions/invitations à jetons hachés, gestion des rôles et permissions par le propriétaire. Une invitation à un compte existant doit être acceptée par l’identité correspondante. La suppression d’un membre désactive uniquement son adhésion, jamais son identité ni l’historique financier.
+6. Livrer l’espace /personal : revenus, dépenses, transferts atomiques, comptes, catégories, budgets et tableau de bord. Clés étrangères composites par userId et contrôles sur chaque lecture/écriture/fichier. Un administrateur d’entreprise n’a aucune autorité sur cet espace.
+7. Intégrer le sélecteur d’espace, les pages tarifaires/abonnement/équipe/factures et le geste de bord mobile/tablette avec seuil et exclusion des composants défilants, overlay, fermeture tactile/Escape et hamburger conservé.
+8. Valider migrations et scénarios A–E avec PostgreSQL local, tests d’isolation et de Stripe simulé/signé, contrôles navigateur mobile/desktop, TypeScript, lint, tests et build. Documenter configuration, choix de compatibilité et limites externes réelles.
+
+Décisions : FREE sans limite artificielle de clients/factures, une place d’équipe ; PRO jusqu’à 25 membres, limites centralisées modifiables. Une entreprise garde sa devise de registre ; aucune conversion implicite. Les achats Stripe concernent le web/PWA ; la publication des clients de boutique et leur parcours d’achat demandent une validation dédiée avant soumission. Aucun déploiement ni migration de production pendant cette évolution.
+
 ## Objectif et état initial
+
+### Validation de l’évolution du 27 septembre 2026
+
+Les huit étapes de l’évolution FREE/PRO et personnelle sont implémentées. Vérifications exécutées : TypeScript, ESLint, 49 tests unitaires, build Next.js de production et vérification de l’artefact standalone sans configuration privée. Les tests PostgreSQL couvrent comptes/équipes, permissions par entreprise, factures personnalisées, webhooks Stripe signés, finances personnelles, rapports et un cycle complet pour le propriétaire FREE (100 € encaissés, 15 € dépensés, solde 85 €).
+
+Non-régression : les 26 contrôles financiers initiaux, les 18 contrôles de saisie rapide et les 25 contrôles HTTP du scénario complet passent sur des schémas PostgreSQL locaux isolés. Une migration depuis l’ancien schéma peuplé compare dix tables avant/après, conserve les écritures et valide les 27 références aux appartenances. Les parcours navigateur réels vérifient inscriptions/invitations, documents PDF, budgets, justificatifs, changement d’espace, mode sombre et affichage entre 320 et 1 440 px. Les gestes du menu sont testés à 390, 820 et 1 440 px, y compris les tableaux horizontaux, Échap et l’overlay.
+
+Stripe est exercé avec un adaptateur simulé et des signatures réelles ; il reste à fournir les variables privées du compte Stripe et à effectuer une recette Checkout en mode test avant paiement réel. Les adaptations des clients iOS/Android et leurs tests sont ajoutés, mais leur compilation native n’a pas été exécutée dans cet environnement Windows sans Java/Xcode. Aucun déploiement ni migration de production n’a été effectué. Configuration et reproduction : [docs/PLANS_AND_WORKSPACES.md](docs/PLANS_AND_WORKSPACES.md).
 
 ## Extension boutiques mobiles — 16 septembre 2026
 

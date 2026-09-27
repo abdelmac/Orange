@@ -31,6 +31,27 @@ class AppPolicyTest {
         assertFalse(AppPolicy.isBridgeRequest("POST", "/api/users"))
         assertFalse(AppPolicy.isBridgeRequest("GET", "https://evil.test"))
     }
+    @Test fun personalAttachmentsUseTheSamePrivateDownloadPolicy() {
+        listOf("/api/attachments/$id", "/api/personal/attachments/$id", "/api/personal/attachments/$id?inline=1").forEach {
+            assertTrue(it, AppPolicy.isPrivateDocument(AppPolicy.ORIGIN + it))
+            assertTrue(it, AppPolicy.isPrivateAttachment(AppPolicy.ORIGIN + it))
+        }
+        listOf(
+            "${AppPolicy.ORIGIN}/api/personal/attachments/not-a-uuid",
+            "${AppPolicy.ORIGIN}/api/personal/attachments/$id/extra",
+            "${AppPolicy.ORIGIN}/api/personal/attachments/%61${id.drop(1)}",
+            "${AppPolicy.ORIGIN}/api/personal/attachments/$id?redirect=https://evil.test",
+            "${AppPolicy.ORIGIN}/api/personal/attachments/$id?inline=1&inline=1",
+            "${AppPolicy.ORIGIN}/api/personal/attachments/$id#fragment",
+            "https://evil.test/api/personal/attachments/$id",
+            "https://orange-finance.onrender.com.evil.test/api/personal/attachments/$id",
+            "http://orange-finance.onrender.com/api/personal/attachments/$id"
+        ).forEach {
+            assertFalse(it, AppPolicy.isPrivateDocument(it))
+            assertFalse(it, AppPolicy.isPrivateAttachment(it))
+        }
+        assertFalse(AppPolicy.isPrivateAttachment("${AppPolicy.ORIGIN}/api/invoices/$id/pdf"))
+    }
     @Test fun amountNormalizationIsExact() {
         assertEquals("4000.25", AppPolicy.normalizeAmount("4 000,25"))
         assertEquals("4000.00", AppPolicy.normalizeAmount("4\u202f000"))

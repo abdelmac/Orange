@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, Globe2, LockKeyhole, Moon, Save, ShieldCheck } from "lucide-react";
 import { ThemeOptions } from "./theme-picker";
@@ -62,6 +63,24 @@ export function Settings() {
           <p>Votre profil, votre sécurité et les informations de votre entreprise.</p>
         </div>
       </div>
+      <nav className="settings-shortcuts" aria-label="Réglages de votre espace">
+        <Link className="button secondary" href="/abonnement">
+          Mon abonnement
+        </Link>
+        {can("settings.edit") && (
+          <Link className="button secondary" href="/parametres/factures">
+            Personnaliser mes factures
+          </Link>
+        )}
+        {Boolean(user.isOwner) && (
+          <Link className="button secondary" href="/parametres/equipe">
+            Mon équipe
+          </Link>
+        )}
+        <Link className="button secondary" href="/onboarding">
+          Mes espaces et mon profil
+        </Link>
+      </nav>
       <div className="settings-grid">
         <section className="card settings-card theme-settings permissions-card">
           <h2>

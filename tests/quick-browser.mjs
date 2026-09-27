@@ -62,7 +62,7 @@ async function fixture() {
           name: `Rapide ${source.label}`,
           email: `quick-${role.name.toLowerCase()}-${run}@browser.test`,
           passwordHash,
-          roles: { create: { roleId: role.id } },
+          roles: { create: { companyId: company.id, roleId: role.id } },
           ...(role.name === "SALESPERSON" ? { salesperson: { create: {} } } : {}),
         },
       });

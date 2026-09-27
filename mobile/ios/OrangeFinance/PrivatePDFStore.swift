@@ -115,7 +115,7 @@ private final class PDFTransfer: NSObject, URLSessionDataDelegate, @unchecked Se
         if http.statusCode == 401 { completionHandler(.cancel); finish(.failure(PDFError.expired)); return }
         let mime = response.mimeType?.lowercased() ?? ""
         let extensions = ["application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"]
-        guard http.statusCode == 200, let suffix = extensions[mime], mime == "application/pdf" || http.url?.path.hasPrefix("/api/attachments/") == true else { completionHandler(.cancel); finish(.failure(PDFError.invalid)); return }
+        guard http.statusCode == 200, let suffix = extensions[mime], mime == "application/pdf" || OriginPolicy.isPrivateAttachment(http.url) else { completionHandler(.cancel); finish(.failure(PDFError.invalid)); return }
         mimeType = mime
         destination = destination.deletingPathExtension().appendingPathExtension(suffix)
         guard response.expectedContentLength <= Int64(maxBytes) else { completionHandler(.cancel); finish(.failure(PDFError.tooLarge)); return }

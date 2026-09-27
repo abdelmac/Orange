@@ -17,6 +17,7 @@ import { useSession } from "./app-shell";
 import { date, money, related, Row, rows, value } from "@/lib/format";
 import { CashPanel, DashboardMetrics, PendingPanel, RecentPanel } from "./dashboard-panels";
 import { Empty, ErrorMessage, Loading, PeriodFilter } from "./ui";
+import { AdvancedReport } from "./advanced-report";
 
 export function ActivityChart({
   series,
@@ -440,6 +441,12 @@ export function Dashboard({ report = false }: { report?: boolean }) {
           </>
         )
       )}
+      {report &&
+        ["OWNER", "ADMIN", "MANAGER", "ACCOUNTANT"].includes(String(user.role)) &&
+        can("reports.view") &&
+        canSales &&
+        canExpenses &&
+        can("invoices.view") && <AdvancedReport />}
     </div>
   );
 }

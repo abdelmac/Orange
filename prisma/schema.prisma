@@ -8,33 +8,47 @@ datasource db {
 }
 
 model Company {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  currency  String   @default("EUR") @db.Char(3)
-  address   String?
-  phone     String?
-  email     String?
-  taxNumber String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
+  id                   String                @id @default(uuid()) @db.Uuid
+  name                 String
+  currency             String                @default("EUR") @db.Char(3)
+  address              String?
+  phone                String?
+  email                String?
+  taxNumber            String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  users                User[]
+  memberships          CompanyMembership[]
+  subscription         Subscription?
+  invoiceCustomization InvoiceCustomization?
+  invitations          TeamInvitation[]
 }
 
 model User {
   id                    String                 @id @default(uuid()) @db.Uuid
-  companyId             String                 @db.Uuid
-  company               Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  companyId             String?                @db.Uuid
+  company               Company?               @relation(fields: [companyId], references: [id], onDelete: Restrict)
   name                  String
   email                 String                 @unique
   passwordHash          String
   active                Boolean                @default(true)
   locale                String                 @default("fr")
+  usageType             AccountUsageType       @default(BUSINESS)
+  personalCurrency      String                 @default("EUR") @db.Char(3)
+  memberships           CompanyMembership[]
+  sentInvitations       TeamInvitation[]
+  personalAccounts      PersonalAccount[]
+  personalCategories    PersonalCategory[]
+  personalTransactions  PersonalTransaction[]
+  personalBudgets       PersonalBudget[]
+  personalAttachments   PersonalAttachment[]
+  personalSubscription  Subscription?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   roles                 UserRole[]
   sessions              Session[]
   resetTokens           PasswordResetToken[]
-  salesperson           SalespersonProfile?
+  salesperson           SalespersonProfile[]
   clients               Client[]
   sales                 Sale[]
   invoices              Invoice[]
@@ -57,16 +71,18 @@ model Role {
   label       String
   permissions RolePermission[]
   users       UserRole[]
+  invitations TeamInvitation[]
 
   @@unique([companyId, name])
   @@unique([companyId, id])
 }
 
 model Permission {
-  id    String           @id @default(uuid()) @db.Uuid
-  key   String           @unique
-  label String?
-  roles RolePermission[]
+  id              String                 @id @default(uuid()) @db.Uuid
+  key             String                 @unique
+  label           String?
+  roles           RolePermission[]
+  memberOverrides MembershipPermission[]
 }
 
 model RolePermission {
@@ -83,7 +99,7 @@ model UserRole {
   companyId String @db.Uuid
   userId    String @db.Uuid
   roleId    String @db.Uuid
-  user      User   @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Cascade)
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   role      Role   @relation(fields: [companyId, roleId], references: [companyId, id], onDelete: Restrict)
 
   @@id([userId, roleId])
@@ -91,10 +107,10 @@ model UserRole {
 
 model Session {
   id        String   @id @default(uuid()) @db.Uuid
-  companyId String   @db.Uuid
+  companyId String?  @db.Uuid
   userId    String   @db.Uuid
   tokenHash String   @unique
-  user      User     @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
 
@@ -111,7 +127,7 @@ model LoginAttempt {
 
 model PasswordResetToken {
   id        String    @id @default(uuid()) @db.Uuid
-  companyId String    @db.Uuid
+  companyId String?   @db.Uuid
   userId    String    @db.Uuid
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   tokenHash String    @unique
@@ -135,7 +151,7 @@ model Client {
   taxNumber        String?
   notes            String?
   salespersonId    String?                @db.Uuid
-  salesperson      User?                  @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  salesperson      User?                  @relation(fields: [salespersonId], references: [id], onDelete: Restrict)
   creditLimitMinor BigInt                 @default(0)
   active           Boolean                @default(true)
   createdAt        DateTime               @default(now())
@@ -174,8 +190,8 @@ model Supplier {
 model SalespersonProfile {
   id                String   @id @default(uuid()) @db.Uuid
   companyId         String   @db.Uuid
-  userId            String   @unique @db.Uuid
-  user              User     @relation(fields: [companyId, userId], references: [companyId, id], onDelete: Restrict)
+  userId            String   @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Restrict)
   commissionPercent Decimal  @default(0) @db.Decimal(7, 4)
   phone             String?
   createdAt         DateTime @default(now())
@@ -191,7 +207,7 @@ model CashAccount {
   type          String    @default("CASH")
   currency      String    @default("EUR") @db.Char(3)
   responsibleId String?   @db.Uuid
-  responsible   User?     @relation(fields: [companyId, responsibleId], references: [companyId, id], onDelete: Restrict)
+  responsible   User?     @relation(fields: [responsibleId], references: [id], onDelete: Restrict)
   active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -209,7 +225,7 @@ model Sale {
   clientId       String     @db.Uuid
   client         Client     @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
   salespersonId  String?    @db.Uuid
-  salesperson    User?      @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  salesperson    User?      @relation(fields: [salespersonId], references: [id], onDelete: Restrict)
   date           DateTime   @default(now())
   status         String     @default("INVOICED")
   currency       String     @default("EUR") @db.Char(3)
@@ -252,32 +268,33 @@ model SaleLine {
 }
 
 model Invoice {
-  id            String                 @id @default(uuid()) @db.Uuid
-  companyId     String                 @db.Uuid
-  number        String
-  saleId        String                 @unique @db.Uuid
-  sale          Sale                   @relation(fields: [companyId, saleId], references: [companyId, id], onDelete: Restrict)
-  clientId      String                 @db.Uuid
-  client        Client                 @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
-  salespersonId String?                @db.Uuid
-  salesperson   User?                  @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
-  date          DateTime               @default(now())
-  dueDate       DateTime
-  status        String                 @default("ISSUED")
-  currency      String                 @default("EUR") @db.Char(3)
-  subtotalMinor BigInt
-  discountMinor BigInt                 @default(0)
-  taxMinor      BigInt                 @default(0)
-  totalMinor    BigInt
-  paidMinor     BigInt                 @default(0)
-  notes         String?
-  terms         String?
-  createdById   String                 @db.Uuid
-  createdAt     DateTime               @default(now())
-  updatedAt     DateTime               @updatedAt
-  lines         InvoiceLine[]
-  payments      Payment[]
-  transactions  FinancialTransaction[]
+  id                    String                 @id @default(uuid()) @db.Uuid
+  companyId             String                 @db.Uuid
+  number                String
+  saleId                String                 @unique @db.Uuid
+  sale                  Sale                   @relation(fields: [companyId, saleId], references: [companyId, id], onDelete: Restrict)
+  clientId              String                 @db.Uuid
+  client                Client                 @relation(fields: [companyId, clientId], references: [companyId, id], onDelete: Restrict)
+  salespersonId         String?                @db.Uuid
+  salesperson           User?                  @relation(fields: [salespersonId], references: [id], onDelete: Restrict)
+  date                  DateTime               @default(now())
+  dueDate               DateTime
+  status                String                 @default("ISSUED")
+  currency              String                 @default("EUR") @db.Char(3)
+  subtotalMinor         BigInt
+  discountMinor         BigInt                 @default(0)
+  taxMinor              BigInt                 @default(0)
+  totalMinor            BigInt
+  paidMinor             BigInt                 @default(0)
+  notes                 String?
+  terms                 String?
+  createdById           String                 @db.Uuid
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  customizationSnapshot Json?
+  lines                 InvoiceLine[]
+  payments              Payment[]
+  transactions          FinancialTransaction[]
 
   @@unique([companyId, id])
   @@unique([companyId, saleId])
@@ -319,7 +336,7 @@ model Payment {
   cashAccountId  String?      @db.Uuid
   cashAccount    CashAccount? @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
   salespersonId  String?      @db.Uuid
-  salesperson    User?        @relation(fields: [companyId, salespersonId], references: [companyId, id], onDelete: Restrict)
+  salesperson    User?        @relation(fields: [salespersonId], references: [id], onDelete: Restrict)
   date           DateTime     @default(now())
   reference      String?
   comment        String?
@@ -350,7 +367,7 @@ model Expense {
   companyId             String                 @db.Uuid
   number                String
   requesterId           String                 @db.Uuid
-  requester             User                   @relation("ExpenseRequester", fields: [companyId, requesterId], references: [companyId, id], onDelete: Restrict)
+  requester             User                   @relation("ExpenseRequester", fields: [requesterId], references: [id], onDelete: Restrict)
   supplierId            String?                @db.Uuid
   supplier              Supplier?              @relation(fields: [companyId, supplierId], references: [companyId, id], onDelete: Restrict)
   categoryId            String?                @db.Uuid
@@ -369,7 +386,7 @@ model Expense {
   cashAccount           CashAccount?           @relation(fields: [companyId, cashAccountId], references: [companyId, id], onDelete: Restrict)
   comment               String?
   approverId            String?                @db.Uuid
-  approver              User?                  @relation("ExpenseApprover", fields: [companyId, approverId], references: [companyId, id], onDelete: Restrict)
+  approver              User?                  @relation("ExpenseApprover", fields: [approverId], references: [id], onDelete: Restrict)
   approvedAt            DateTime?
   paidAt                DateTime?
   status                String                 @default("PENDING")
@@ -407,9 +424,9 @@ model FinancialTransaction {
   paymentId                String?               @db.Uuid
   date                     DateTime              @default(now())
   createdById              String                @db.Uuid
-  creator                  User                  @relation("TransactionCreator", fields: [companyId, createdById], references: [companyId, id], onDelete: Restrict)
+  creator                  User                  @relation("TransactionCreator", fields: [createdById], references: [id], onDelete: Restrict)
   validatedById            String                @db.Uuid
-  validator                User                  @relation("TransactionValidator", fields: [companyId, validatedById], references: [companyId, id], onDelete: Restrict)
+  validator                User                  @relation("TransactionValidator", fields: [validatedById], references: [id], onDelete: Restrict)
   status                   String                @default("VALIDATED")
   comment                  String?
   reference                String?
@@ -458,7 +475,7 @@ model TransactionReceipt {
   number        String
   snapshot      Json
   issuedById    String               @db.Uuid
-  issuedBy      User                 @relation(fields: [companyId, issuedById], references: [companyId, id], onDelete: Restrict)
+  issuedBy      User                 @relation(fields: [issuedById], references: [id], onDelete: Restrict)
   createdAt     DateTime             @default(now())
 
   @@unique([companyId, id])
@@ -554,4 +571,231 @@ model DocumentSequence {
   value     Int    @default(0)
 
   @@id([companyId, type, year])
+}
+
+enum AccountUsageType {
+  BUSINESS
+  PERSONAL
+  BOTH
+}
+
+enum SubscriptionStatus {
+  FREE
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+enum PersonalCategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum PersonalTransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+model CompanyMembership {
+  companyId   String                 @db.Uuid
+  userId      String                 @db.Uuid
+  company     Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  active      Boolean                @default(true)
+  isOwner     Boolean                @default(false)
+  createdAt   DateTime               @default(now()) @db.Timestamptz(3)
+  permissions MembershipPermission[]
+
+  @@id([companyId, userId])
+  @@index([userId, active])
+}
+
+model MembershipPermission {
+  companyId     String            @db.Uuid
+  userId        String            @db.Uuid
+  permissionKey String
+  allowed       Boolean
+  membership    CompanyMembership @relation(fields: [companyId, userId], references: [companyId, userId], onDelete: Cascade)
+  permission    Permission        @relation(fields: [permissionKey], references: [key], onDelete: Restrict)
+
+  @@id([companyId, userId, permissionKey])
+  @@index([permissionKey])
+}
+
+model TeamInvitation {
+  id          String           @id @default(uuid()) @db.Uuid
+  companyId   String           @db.Uuid
+  company     Company          @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  email       String
+  roleId      String           @db.Uuid
+  role        Role             @relation(fields: [companyId, roleId], references: [companyId, id], onDelete: Restrict)
+  tokenHash   String           @unique @db.Char(64)
+  status      InvitationStatus @default(PENDING)
+  expiresAt   DateTime         @db.Timestamptz(3)
+  invitedById String           @db.Uuid
+  invitedBy   User             @relation(fields: [invitedById], references: [id], onDelete: Restrict)
+  acceptedAt  DateTime?        @db.Timestamptz(3)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(3)
+
+  @@index([companyId, status, email])
+  @@index([companyId, roleId])
+  @@index([invitedById])
+  @@index([expiresAt])
+}
+
+model SubscriptionPlan {
+  id                String         @id @default(uuid()) @db.Uuid
+  name              String
+  code              String         @unique
+  monthlyPriceMinor Int            @default(0)
+  currency          String         @default("EUR") @db.Char(3)
+  isActive          Boolean        @default(true)
+  features          Json
+  createdAt         DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime       @updatedAt @db.Timestamptz(3)
+  subscriptions     Subscription[]
+}
+
+model Subscription {
+  id                     String             @id @default(uuid()) @db.Uuid
+  companyId              String?            @unique @db.Uuid
+  company                Company?           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  userId                 String?            @unique @db.Uuid
+  user                   User?              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  planId                 String             @db.Uuid
+  plan                   SubscriptionPlan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+  status                 SubscriptionStatus @default(FREE)
+  startedAt              DateTime           @default(now()) @db.Timestamptz(3)
+  currentPeriodStart     DateTime?          @db.Timestamptz(3)
+  currentPeriodEnd       DateTime?          @db.Timestamptz(3)
+  cancelAtPeriodEnd      Boolean            @default(false)
+  externalSubscriptionId String?            @unique
+  stripeCustomerId       String?            @unique
+  checkoutSessionId      String?            @unique
+  checkoutExpiresAt      DateTime?          @db.Timestamptz(3)
+  checkoutAttempt        String?            @db.Uuid
+  createdAt              DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime           @updatedAt @db.Timestamptz(3)
+
+  @@index([planId])
+  @@index([status, currentPeriodEnd])
+}
+
+model BillingEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model InvoiceCustomization {
+  id        String   @id @default(uuid()) @db.Uuid
+  companyId String   @unique @db.Uuid
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  settings  Json     @default("{}")
+  logoData  Bytes?
+  logoMime  String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model PersonalAccount {
+  id                  String                @id @default(uuid()) @db.Uuid
+  userId              String                @db.Uuid
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  name                String
+  type                String                @default("CURRENT")
+  currency            String                @default("EUR") @db.Char(3)
+  initialBalanceMinor BigInt                @default(0)
+  isArchived          Boolean               @default(false)
+  createdAt           DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime              @updatedAt @db.Timestamptz(3)
+  transactions        PersonalTransaction[] @relation("PersonalSource")
+  incomingTransfers   PersonalTransaction[] @relation("PersonalDestination")
+
+  @@unique([userId, id])
+  @@index([userId, isArchived])
+}
+
+model PersonalCategory {
+  id           String                @id @default(uuid()) @db.Uuid
+  userId       String                @db.Uuid
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  name         String
+  type         PersonalCategoryType
+  color        String                @default("#cf5426")
+  transactions PersonalTransaction[]
+  budgets      PersonalBudget[]
+
+  @@unique([userId, id])
+  @@unique([userId, type, name])
+}
+
+model PersonalAttachment {
+  id           String                @id @default(uuid()) @db.Uuid
+  userId       String                @db.Uuid
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  storageKey   String                @unique
+  originalName String
+  mimeType     String
+  size         Int
+  createdAt    DateTime              @default(now()) @db.Timestamptz(3)
+  transactions PersonalTransaction[]
+
+  @@unique([userId, id])
+}
+
+model PersonalTransaction {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  userId               String                  @db.Uuid
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  accountId            String                  @db.Uuid
+  account              PersonalAccount         @relation("PersonalSource", fields: [userId, accountId], references: [userId, id], onDelete: Restrict)
+  destinationAccountId String?                 @db.Uuid
+  destinationAccount   PersonalAccount?        @relation("PersonalDestination", fields: [userId, destinationAccountId], references: [userId, id], onDelete: Restrict)
+  type                 PersonalTransactionType
+  amountMinor          BigInt
+  currency             String                  @db.Char(3)
+  categoryId           String?                 @db.Uuid
+  category             PersonalCategory?       @relation(fields: [userId, categoryId], references: [userId, id], onDelete: Restrict)
+  description          String
+  date                 DateTime                @db.Timestamptz(3)
+  notes                String?
+  attachmentId         String?                 @db.Uuid
+  attachment           PersonalAttachment?     @relation(fields: [userId, attachmentId], references: [userId, id], onDelete: Restrict)
+  idempotencyKey       String                  @db.Uuid
+  createdAt            DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime                @updatedAt @db.Timestamptz(3)
+
+  @@unique([userId, id])
+  @@unique([userId, idempotencyKey])
+  @@index([userId, date])
+  @@index([userId, accountId, date])
+  @@index([userId, destinationAccountId])
+  @@index([userId, categoryId, date])
+  @@index([userId, attachmentId])
+}
+
+model PersonalBudget {
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @db.Uuid
+  user       User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  categoryId String           @db.Uuid
+  category   PersonalCategory @relation(fields: [userId, categoryId], references: [userId, id], onDelete: Restrict)
+  month      Int
+  year       Int
+  limitMinor BigInt
+  currency   String           @db.Char(3)
+
+  @@unique([userId, categoryId, month, year, currency])
+  @@index([userId, year, month])
 }

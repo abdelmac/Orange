@@ -4,8 +4,9 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import styles from "./public-info.module.css";
 import { ThemePicker } from "./theme-picker";
+import { APP_NAME, APP_SUPPORT_EMAIL } from "@/lib/brand";
 
-export const SUPPORT_EMAIL = "ennearock@gmail.com";
+export const SUPPORT_EMAIL = APP_SUPPORT_EMAIL;
 
 export function PublicInfo({
   current,
@@ -23,11 +24,9 @@ export function PublicInfo({
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link className={styles.brand} href="/login" aria-label="Orange Finance, connexion">
+        <Link className={styles.brand} href="/login" aria-label={`${APP_NAME}, connexion`}>
           <Image src="/icon.svg" alt="" width={38} height={38} />
-          <span>
-            Orange <strong>Finance</strong>
-          </span>
+          <span>{APP_NAME}</span>
         </Link>
         <div className={styles.headerActions}>
           <ThemePicker />
@@ -56,7 +55,7 @@ export function PublicInfo({
         <div className={styles.content}>{children}</div>
       </main>
       <footer className={styles.footer}>
-        <span>Orange Finance · Informations mises à jour le 16 septembre 2026</span>
+        <span>{APP_NAME} · Informations mises à jour le 27 septembre 2026</span>
         <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
       </footer>
     </div>

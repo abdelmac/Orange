@@ -2,6 +2,8 @@
 
 Application française de gestion des ventes, factures, encaissements, caisses et dépenses d’une petite entreprise. Les formulaires enregistrent réellement leurs données dans PostgreSQL. Les permissions sont vérifiées sur le serveur et chaque opération est rattachée à une entreprise.
 
+L’inscription gratuite propose maintenant un espace **Entreprise**, **Personnel**, ou **Les deux**. FREE fonctionne sans carte bancaire. **PRO, 4 €/mois**, ajoute les équipes, la personnalisation des factures et les rapports avancés. Le menu permet de changer d’espace et s’ouvre par glissement depuis le bord gauche sur téléphone/tablette. Voir [le guide des offres, de Stripe et des nouveaux espaces](docs/PLANS_AND_WORKSPACES.md) pour la configuration, les migrations et les tests. Ces changements doivent être déployés pour apparaître sur le site en ligne.
+
 **Application en ligne : [orange-finance.onrender.com](https://orange-finance.onrender.com).** Déployée sur Render à Francfort avec PostgreSQL et stockage privé persistant. Voir [le suivi du déploiement](DEPLOYMENT.md).
 
 ## Encaisser et travailler au quotidien

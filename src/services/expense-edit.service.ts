@@ -34,7 +34,7 @@ export async function updateExpense(actor: Actor, id: string, raw: unknown) {
   return atomic(async (tx) => {
     const before = await tx.expense.findFirst({ where: { id, companyId: actor.companyId } });
     if (!before) throw new BusinessError("Dépense introuvable.", 404);
-    if (before.requesterId !== actor.id && actor.role !== "ADMIN")
+    if (before.requesterId !== actor.id && !["OWNER", "ADMIN"].includes(actor.role))
       throw new BusinessError("Vous pouvez modifier uniquement vos propres demandes.", 403);
     if (!["PENDING", "DRAFT"].includes(before.status))
       throw new BusinessError(

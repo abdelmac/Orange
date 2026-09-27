@@ -5,12 +5,14 @@ final class EntryController: UIViewController {
     private let bridge: WebAPIBridge
     var onPDF: ((URL, UIViewController) -> Void)?
     var onRecord: ((String) -> Void)?
+    var onPersonal: ((String) -> Void)?
     private let stack = UIStackView()
     private let status = UILabel()
     private let amount = UITextField(), nameField = UITextField(), phone = UITextField(), memo = UITextField(), reference = UITextField()
     private let kindButton = UIButton(type: .system), methodButton = UIButton(type: .system), accountButton = UIButton(type: .system)
     private let submit = UIButton(type: .system), receipt = UIButton(type: .system), fresh = UIButton(type: .system)
     private let attachment = UIButton(type: .system)
+    private let personalIncome = UIButton(type: .system), personalExpense = UIButton(type: .system), personalHome = UIButton(type: .system)
     private var context: SessionContext?
     private var accounts: [CashAccount] = []
     private var accountID: String?
@@ -60,6 +62,13 @@ final class EntryController: UIViewController {
         attachment.addTarget(self, action: #selector(openRecord), for: .touchUpInside); attachment.isHidden = true
         configure(fresh, title: "Nouvelle saisie", prominent: false)
         fresh.addTarget(self, action: #selector(newEntry), for: .touchUpInside); fresh.isHidden = true
+        configure(personalIncome, title: "Ajouter un revenu personnel", prominent: true)
+        personalIncome.addAction(UIAction { [weak self] _ in self?.onPersonal?("/personal/revenus") }, for: .touchUpInside)
+        configure(personalExpense, title: "Ajouter une dépense personnelle", prominent: false)
+        personalExpense.addAction(UIAction { [weak self] _ in self?.onPersonal?("/personal/depenses") }, for: .touchUpInside)
+        configure(personalHome, title: "Mes comptes et budgets", prominent: false)
+        personalHome.addAction(UIAction { [weak self] _ in self?.onPersonal?("/personal") }, for: .touchUpInside)
+        [personalIncome, personalExpense, personalHome].forEach { $0.isHidden = true }
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh))
         buildMenus(); refresh()
     }
@@ -105,8 +114,21 @@ final class EntryController: UIViewController {
             do {
                 let current: SessionContext = try await bridge.request("/api/me")
                 guard generation == started else { return }
-                if let context, context.user.id != current.user.id || context.company.id != current.company.id { clearSession(); return }
+                if let context, context.user.id != current.user.id || context.company?.id != current.company?.id { clearSession(); refresh(); return }
                 context = current
+                stack.arrangedSubviews.forEach { $0.isHidden = current.isPersonal }
+                status.isHidden = false
+                [personalIncome, personalExpense, personalHome].forEach { $0.isHidden = !current.isPersonal }
+                guard let company = current.company, !current.isPersonal else {
+                    title = "Personnel"
+                    status.text = "Vos finances personnelles restent privées. Choisissez le mouvement à enregistrer."
+                    submit.isEnabled = false
+                    return
+                }
+                title = "Encaisser"
+                receipt.isHidden = result?.transactionId == nil
+                attachment.isHidden = result?.transactionId == nil || !current.can("attachments.create")
+                fresh.isHidden = pending == nil && result == nil
                 if current.user.role == "SALESPERSON" {
                     guard current.can("payments.create") else { throw APIError.server(403, "Votre rôle ne permet pas d’encaisser dans votre portefeuille.") }
                     accounts = []
@@ -121,19 +143,19 @@ final class EntryController: UIViewController {
                         guard all.count <= 10000 else { throw APIError.server(400, "La liste des caisses est trop volumineuse. Utilisez la recherche dans l’accueil.") }
                         page += 1
                     }
-                    accounts = all.filter { $0.active && $0.currency == current.company.currency && (current.user.role != "CASHIER" || (current.user.cashAccountIds ?? []).contains($0.id)) }
+                    accounts = all.filter { $0.active && $0.currency == company.currency && (current.user.role != "CASHIER" || (current.user.cashAccountIds ?? []).contains($0.id)) }
                     if !accounts.contains(where: { $0.id == accountID }) { accountID = accounts.first?.id }
                     guard !accounts.isEmpty else { throw APIError.server(403, "Aucune caisse active autorisée n’est disponible dans la devise de l’entreprise.") }
                 }
                 buildMenus()
-                if pending == nil { status.text = "\(current.company.name) · \(current.company.currency)\nEnregistrement immédiat dans le registre de l’entreprise." }
+                if pending == nil { status.text = "\(company.name) · \(company.currency)\nEnregistrement immédiat dans le registre de l’entreprise." }
                 submit.isEnabled = result == nil
             } catch { if generation == started { status.text = error.localizedDescription; submit.isEnabled = pending != nil && result == nil } }
         }
     }
 
     private func payload() throws -> [String: Any] {
-        guard let context else { throw APIError.unavailable }
+        guard let context, context.company != nil, !context.isPersonal else { throw APIError.unavailable }
         let cleanName = (nameField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanMemo = (memo.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanPhone = (phone.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -153,7 +175,7 @@ final class EntryController: UIViewController {
         guard !busy, result == nil else { return }; endEditing()
         do {
             let body = try pending ?? payload()
-            let alert = UIAlertController(title: "Confirmer l’encaissement", message: "\(body["amount"] as? String ?? "") \(context?.company.currency ?? "") reçus de \(body["partyName"] as? String ?? "").", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Confirmer l’encaissement", message: "\(body["amount"] as? String ?? "") \(context?.company?.currency ?? "") reçus de \(body["partyName"] as? String ?? "").", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Annuler", style: .cancel))
             alert.addAction(UIAlertAction(title: pending == nil ? "Enregistrer" : "Réessayer la même opération", style: .default) { [weak self] _ in self?.send(body) })
             present(alert, animated: true)
@@ -168,7 +190,7 @@ final class EntryController: UIViewController {
             do {
                 let current: SessionContext = try await bridge.request("/api/me")
                 guard generation == started else { return }
-                guard current.user.id == original.user.id, current.company.id == original.company.id else { clearSession(); throw APIError.sessionExpired }
+                guard !current.isPersonal, current.user.id == original.user.id, current.company?.id == original.company?.id else { clearSession(); throw APIError.sessionExpired }
                 let saved: EntryResult = try await bridge.request("/api/quick-entries", method: "POST", body: body)
                 guard generation == started else { return }
                 result = saved

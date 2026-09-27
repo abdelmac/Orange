@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import type { Actor, Tx } from "../lib/finance-context";
+import { resolvePermissions } from "../lib/rbac";
 
 function jsonValue(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(
@@ -35,15 +36,33 @@ export async function notify(
   href: string,
   permission?: string,
 ) {
-  const users = permission
-    ? await tx.user.findMany({
-        where: {
-          companyId: actor.companyId,
-          active: true,
-          roles: { some: { role: { permissions: { some: { permission: { key: permission } } } } } },
+  const memberships = permission
+    ? await tx.companyMembership.findMany({
+        where: { companyId: actor.companyId, active: true, user: { active: true } },
+        include: {
+          permissions: true,
+          user: {
+            select: {
+              roles: {
+                where: { companyId: actor.companyId },
+                include: { role: { include: { permissions: { include: { permission: true } } } } },
+              },
+            },
+          },
         },
-        select: { id: true },
       })
+    : [];
+  const users = permission
+    ? memberships
+        .filter((member) =>
+          resolvePermissions(
+            member.user.roles.flatMap((role) =>
+              role.role.permissions.map((grant) => grant.permission.key),
+            ),
+            member.permissions,
+          ).includes(permission),
+        )
+        .map((member) => ({ id: member.userId }))
     : [{ id: actor.id }];
   if (users.length)
     await tx.notification.createMany({

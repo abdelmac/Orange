@@ -8,7 +8,8 @@ object AppPolicy {
     const val ORIGIN = "https://orange-finance.onrender.com"
     const val MAX_DOCUMENT_BYTES = 20L * 1024 * 1024
     private val uuid = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-    private val documentPath = Regex("/api/(transactions/$uuid/receipt|invoices/$uuid/pdf|attachments/$uuid)")
+    private val documentPath = Regex("/api/(transactions/$uuid/receipt|invoices/$uuid/pdf|attachments/$uuid|personal/attachments/$uuid)")
+    private val attachmentPath = Regex("/api/(attachments/$uuid|personal/attachments/$uuid)")
 
     private fun parse(value: String): URI? = try {
         if (value.any { it <= ' ' || it == '\\' }) null else URI(value)
@@ -49,6 +50,9 @@ object AppPolicy {
             else -> null
         }
     }
+
+    fun isPrivateAttachment(value: String): Boolean = isPrivateDocument(value) &&
+        parse(value)?.path?.let { attachmentPath.matches(it) } == true
 
     fun isBridgeRequest(method: String, path: String): Boolean = when (method) {
         "GET" -> path == "/api/me" || path.matches(Regex("/api/cash-accounts\\?page=[1-9][0-9]{0,4}&pageSize=250"))

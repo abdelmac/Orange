@@ -38,4 +38,27 @@ final class OriginPolicyTests: XCTestCase {
         XCTAssertEqual(allowed.first?.domain, OriginPolicy.host)
         XCTAssertEqual(allowed.first?.name, "orange_session")
     }
+    func testPersonalAttachmentsUseTheSamePrivateDownloadPolicy() {
+        let id = "10000000-0000-4000-8000-000000000001"
+        for path in ["/api/attachments/\(id)", "/api/personal/attachments/\(id)", "/api/personal/attachments/\(id)?inline=1"] {
+            let url = OriginPolicy.localURL(path)
+            XCTAssertTrue(OriginPolicy.allowsPDF(url), path)
+            XCTAssertTrue(OriginPolicy.isPrivateAttachment(url), path)
+        }
+        for value in [
+            OriginPolicy.origin + "/api/personal/attachments/not-a-uuid",
+            OriginPolicy.origin + "/api/personal/attachments/\(id)/extra",
+            OriginPolicy.origin + "/api/personal/attachments/%31\(id.dropFirst())",
+            OriginPolicy.origin + "/api/personal/attachments/\(id)?redirect=https://evil.test",
+            OriginPolicy.origin + "/api/personal/attachments/\(id)?inline=1&inline=1",
+            OriginPolicy.origin + "/api/personal/attachments/\(id)#fragment",
+            "https://evil.test/api/personal/attachments/\(id)",
+            "https://orange-finance.onrender.com.evil.test/api/personal/attachments/\(id)",
+            "http://orange-finance.onrender.com/api/personal/attachments/\(id)"
+        ] {
+            XCTAssertFalse(OriginPolicy.allowsPDF(URL(string: value)), value)
+            XCTAssertFalse(OriginPolicy.isPrivateAttachment(URL(string: value)), value)
+        }
+        XCTAssertFalse(OriginPolicy.isPrivateAttachment(OriginPolicy.localURL("/api/invoices/\(id)/pdf")))
+    }
 }

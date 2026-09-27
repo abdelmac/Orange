@@ -5,6 +5,7 @@ import { hashPassword } from "../src/lib/password";
 import { atomic } from "../src/lib/finance-context";
 import { permissionDefinitions, roleLabels, rolePermissions } from "../src/lib/rbac";
 import { audit } from "../src/services/audit.service";
+import { ensureFreeSubscription } from "../src/services/entitlement.service";
 
 loadEnvConfig(process.cwd());
 
@@ -43,7 +44,7 @@ async function main() {
             permissionId: permission.id,
           })),
       });
-      if (name === "ADMIN") adminRoleId = role.id;
+      if (name === "OWNER") adminRoleId = role.id;
     }
     if (!adminRoleId) throw new Error("Rôle administrateur manquant.");
     const user = await tx.user.create({
@@ -52,9 +53,10 @@ async function main() {
         name: input.ADMIN_NAME,
         email: input.ADMIN_EMAIL,
         passwordHash,
-        roles: { create: { roleId: adminRoleId } },
+        roles: { create: { companyId: created.id, roleId: adminRoleId } },
       },
     });
+    await ensureFreeSubscription(created.id, tx);
     await tx.cashAccount.create({
       data: {
         companyId: created.id,

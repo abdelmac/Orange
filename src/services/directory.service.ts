@@ -17,7 +17,8 @@ import { parseMoney } from "@/lib/money";
 import { audit } from "./audit.service";
 import { listDirectory } from "./directory-read.service";
 import { updateExpense } from "./expense-edit.service";
-import { publicUserSelect } from "@/lib/user-select";
+import { companyUserSelect } from "@/lib/user-select";
+import { assertTeamOwner, checkTeamCapacity, updateMember } from "./team.service";
 
 export async function listCollection(
   actor: Actor,
@@ -37,9 +38,9 @@ async function checkPerson(
   const exists = await tx.user.findFirst({
     where: {
       id,
-      companyId: actor.companyId,
+      memberships: { some: { companyId: actor.companyId, active: true } },
       active: true,
-      ...(salesperson ? { salesperson: { isNot: null } } : {}),
+      ...(salesperson ? { salesperson: { some: { companyId: actor.companyId } } } : {}),
     },
     select: { id: true },
   });
@@ -58,6 +59,8 @@ async function checkRoleGrant(tx: Prisma.TransactionClient, actor: Actor, roleId
     include: { permissions: { include: { permission: true } } },
   });
   if (!role) throw new HttpError(400, "Rôle introuvable.");
+  if (role.name === "OWNER")
+    throw new HttpError(403, "Le rôle propriétaire ne peut pas être attribué à un membre.");
   if (role.permissions.some((grant) => !actor.permissions.includes(grant.permission.key)))
     throw new HttpError(
       403,
@@ -128,16 +131,26 @@ export async function createDirectoryItem(actor: Actor, collection: string, inpu
     const { roleId, password, ...fields } = userInput.parse(input);
     const passwordHash = await hashPassword(password);
     return db.$transaction(async (tx) => {
+      await assertTeamOwner(actor, tx);
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`team:${actor.companyId}`}))`;
+      await checkTeamCapacity(actor.companyId, tx);
       const role = await checkRoleGrant(tx, actor, roleId);
       const item = await tx.user.create({
         data: {
           ...fields,
           companyId: actor.companyId,
           passwordHash,
-          roles: { create: { roleId } },
-          ...(role.name === "SALESPERSON" ? { salesperson: { create: {} } } : {}),
+          roles: { create: { companyId: actor.companyId, roleId } },
+          ...(role.name === "SALESPERSON"
+            ? { salesperson: { create: { companyId: actor.companyId } } }
+            : {}),
         },
-        select: publicUserSelect,
+        select: companyUserSelect(actor.companyId),
+      });
+      await tx.companyMembership.upsert({
+        where: { companyId_userId: { companyId: actor.companyId, userId: item.id } },
+        create: { companyId: actor.companyId, userId: item.id },
+        update: {},
       });
       await audit(tx, actor, { action: "CREATE", entity: "User", entityId: item.id, after: item });
       return item;
@@ -239,64 +252,30 @@ export async function updateDirectoryItem(
   if (collection === "users") {
     assertPermission(actor, "users.edit");
     const { roleId, ...fields } = userPatchInput.parse(input);
-    if (id === actor.id && fields.active === false)
-      throw new HttpError(400, "Vous ne pouvez pas désactiver votre propre compte.");
-    return db.$transaction(async (tx) => {
-      const before = await tx.user.findFirst({
-        where: { id, companyId: actor.companyId },
-        select: publicUserSelect,
-      });
-      if (!before) throw new HttpError(404, "Utilisateur introuvable.");
-      const roleChanged = Boolean(roleId && !before.roles.some((item) => item.role.id === roleId));
-      if (roleChanged && id === actor.id)
-        throw new HttpError(400, "Vous ne pouvez pas modifier votre propre rôle.");
-      if (roleId && roleChanged) {
-        const role = await checkRoleGrant(tx, actor, roleId);
-        if (
-          before.roles.some((item) => item.role.name === "SALESPERSON") &&
-          role.name !== "SALESPERSON"
-        ) {
-          const [incoming, outgoing] = await Promise.all([
-            tx.financialTransaction.aggregate({
-              where: {
-                companyId: actor.companyId,
-                destinationSalespersonId: id,
-                status: "VALIDATED",
-              },
-              _sum: { amountMinor: true },
-            }),
-            tx.financialTransaction.aggregate({
-              where: { companyId: actor.companyId, sourceSalespersonId: id, status: "VALIDATED" },
-              _sum: { amountMinor: true },
-            }),
-          ]);
-          if ((incoming._sum.amountMinor ?? 0n) !== (outgoing._sum.amountMinor ?? 0n))
-            throw new HttpError(
-              400,
-              "Ce commercial doit remettre ses fonds avant de changer de rôle.",
-            );
-        }
-        await tx.userRole.deleteMany({ where: { userId: id, companyId: actor.companyId } });
-        await tx.userRole.create({ data: { companyId: actor.companyId, userId: id, roleId } });
-        if (role.name === "SALESPERSON")
-          await tx.salespersonProfile.upsert({
-            where: { userId: id },
-            create: { companyId: actor.companyId, userId: id },
-            update: {},
-          });
-      }
-      const item = await tx.user.update({ where: { id }, data: fields, select: publicUserSelect });
-      if (roleChanged || fields.active === false)
-        await tx.session.deleteMany({ where: { userId: id, companyId: actor.companyId } });
-      await audit(tx, actor, {
-        action: "UPDATE",
-        entity: "User",
-        entityId: id,
-        before,
-        after: item,
-      });
-      return item;
+    await assertTeamOwner(actor);
+    const before = await db.user.findFirst({
+      where: { id, memberships: { some: { companyId: actor.companyId } } },
+      select: companyUserSelect(actor.companyId),
     });
+    if (!before) throw new HttpError(404, "Utilisateur introuvable.");
+    if (
+      (fields.name && fields.name !== before.name) ||
+      (fields.email && fields.email !== before.email)
+    )
+      throw new HttpError(
+        403,
+        "Chaque utilisateur gère ses informations personnelles depuis son profil. Vous pouvez modifier son rôle ou son accès à l’entreprise.",
+      );
+    const role = roleId
+      ? await db.role.findFirst({ where: { id: roleId, companyId: actor.companyId } })
+      : null;
+    if (roleId && !role) throw new HttpError(400, "Rôle introuvable.");
+    await updateMember(actor, id, { role: role?.name, active: fields.active });
+    const item = await db.user.findUniqueOrThrow({
+      where: { id },
+      select: companyUserSelect(actor.companyId),
+    });
+    return { ...item, active: item.memberships[0]?.active ?? false };
   }
   if (collection === "cash-accounts") {
     assertPermission(actor, "cash.edit");

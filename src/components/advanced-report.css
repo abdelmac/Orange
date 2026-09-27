@@ -1,0 +1,129 @@
+.advanced-report {
+  margin-top: 22px;
+  padding: 24px;
+}
+.advanced-report > header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.advanced-report > header > div {
+  flex: 1;
+}
+.advanced-report h2 {
+  font-size: 16px;
+  font-weight: 650;
+}
+.advanced-report h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0 14px;
+}
+.advanced-report p,
+.advanced-report small {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.advanced-upsell {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 26px 15px;
+  background: var(--surface-muted);
+  border-radius: 12px;
+}
+.advanced-upsell h3 {
+  margin: 0;
+}
+.advanced-upsell .button {
+  margin-top: 12px;
+  min-height: 46px;
+}
+.advanced-bars {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  overflow-x: auto;
+  height: 220px;
+  padding: 15px 0;
+}
+.advanced-bars > div {
+  min-width: 32px;
+  flex: 1;
+  max-width: 70px;
+  text-align: center;
+}
+.advanced-bars > div > div {
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+}
+.advanced-bars span {
+  width: 18px;
+  border-radius: 4px 4px 0 0;
+}
+.advanced-sales {
+  background: var(--chart-sales);
+}
+.advanced-expenses {
+  background: var(--chart-expenses);
+}
+.advanced-table {
+  overflow-x: auto;
+}
+.advanced-table table {
+  width: 100%;
+  min-width: 500px;
+  border-collapse: collapse;
+}
+.advanced-table th,
+.advanced-table td {
+  text-align: right;
+  padding: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+.advanced-table th:first-child {
+  text-align: left;
+}
+.advanced-aging {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.advanced-aging article {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.advanced-aging span,
+.advanced-aging small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+.advanced-aging strong {
+  display: block;
+  font-size: 18px;
+  margin: 10px 0;
+}
+.advanced-total {
+  margin-top: 15px;
+}
+@media (max-width: 760px) {
+  .advanced-report {
+    padding: 16px;
+  }
+  .advanced-aging {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .advanced-bars {
+    gap: 14px;
+  }
+}

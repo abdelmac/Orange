@@ -14,6 +14,7 @@ import {
 } from "../src/services/expense.service";
 import { adjustCash, transferCash } from "../src/services/cash.service";
 import { handoverCash } from "../src/services/salesperson.service";
+import { ensurePlan } from "../src/services/entitlement.service";
 
 loadEnvConfig(process.cwd());
 
@@ -41,6 +42,12 @@ async function main() {
       email: "contact@demo.local",
       taxNumber: "FR-DEMO-2026",
     },
+  });
+  const legacyPlan = await ensurePlan("LEGACY");
+  await db.subscription.upsert({
+    where: { companyId: company.id },
+    update: {},
+    create: { companyId: company.id, planId: legacyPlan.id, status: "FREE" },
   });
   for (const permission of permissionDefinitions)
     await db.permission.upsert({
@@ -90,7 +97,7 @@ async function main() {
     });
     if (item.role === "SALESPERSON")
       await db.salespersonProfile.upsert({
-        where: { userId: user.id },
+        where: { companyId_userId: { companyId: company.id, userId: user.id } },
         create: { companyId: company.id, userId: user.id, commissionPercent: "3" },
         update: {},
       });

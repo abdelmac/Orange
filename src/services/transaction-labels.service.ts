@@ -39,7 +39,7 @@ export async function withTransactionLabels<T extends Movement>(
       select: { id: true, name: true },
     }),
     database.user.findMany({
-      where: { companyId: actor.companyId, id: { in: personIds } },
+      where: { memberships: { some: { companyId: actor.companyId } }, id: { in: personIds } },
       select: { id: true, name: true },
     }),
   ]);

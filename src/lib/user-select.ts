@@ -10,3 +10,11 @@ export const publicUserSelect = {
   createdAt: true,
   roles: { select: { role: { select: { id: true, name: true, label: true } } } },
 } satisfies Prisma.UserSelect;
+
+export function companyUserSelect(companyId: string) {
+  return {
+    ...publicUserSelect,
+    roles: { where: { companyId }, ...publicUserSelect.roles },
+    memberships: { where: { companyId }, select: { active: true, isOwner: true } },
+  } satisfies Prisma.UserSelect;
+}

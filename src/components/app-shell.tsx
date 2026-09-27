@@ -10,7 +10,6 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   CirclePlus,
-  ChevronDown,
   ChevronRight,
   CreditCard,
   FileText,
@@ -30,11 +29,15 @@ import { api, post } from "./api";
 import { Row, value } from "@/lib/format";
 import { translate } from "@/lib/i18n";
 import { ThemeOptions, ThemePicker } from "./theme-picker";
+import { useSidebarGesture } from "./use-sidebar-gesture";
+import { APP_BRAND_NAME } from "@/lib/brand";
 
 interface Session {
   user: Row;
   company: Row;
   permissions: string[];
+  memberships: { companyId: string; name: string; isOwner: boolean }[];
+  workspace: "BUSINESS" | "PERSONAL";
   can: (permission: string) => boolean;
 }
 const SessionContext = createContext<Session | null>(null);
@@ -147,17 +150,53 @@ export const navigation = [
 ];
 export function Brand() {
   return (
-    <Link className="brand" href="/" aria-label="Orange accueil">
+    <Link className="brand" href="/" aria-label={`${APP_BRAND_NAME} accueil`}>
       <span className="brand-mark">
         <span />
       </span>
       <span>
-        orange<span className="brand-dot">.</span>
+        {APP_BRAND_NAME.toLowerCase()}
+        <span className="brand-dot">.</span>
       </span>
     </Link>
   );
 }
 
+const personalNavigation = [
+  {
+    href: "/personal",
+    label: "Tableau de bord",
+    icon: LayoutDashboard,
+    permission: "",
+    group: "MES FINANCES PERSONNELLES",
+  },
+  {
+    href: "/personal/transactions",
+    label: "Transactions",
+    icon: ArrowLeftRight,
+    permission: "",
+    group: "",
+  },
+  { href: "/personal/depenses", label: "Dépenses", icon: CreditCard, permission: "", group: "" },
+  { href: "/personal/revenus", label: "Revenus", icon: ArrowDownLeft, permission: "", group: "" },
+  { href: "/personal/budgets", label: "Budgets", icon: CalendarDays, permission: "", group: "" },
+  {
+    href: "/personal/categories",
+    label: "Catégories",
+    icon: ShoppingBag,
+    permission: "",
+    group: "",
+  },
+  { href: "/personal/comptes", label: "Comptes", icon: Wallet, permission: "", group: "" },
+  {
+    href: "/personal/statistiques",
+    label: "Statistiques",
+    icon: BarChart3,
+    permission: "",
+    group: "",
+  },
+  { href: "/personal/parametres", label: "Paramètres", icon: Settings2, permission: "", group: "" },
+];
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter(),
     pathname = usePathname();
@@ -170,11 +209,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useState(""),
     [results, setResults] = useState<Row[]>([]),
     [searching, setSearching] = useState(false);
+  const { aside, compact } = useSidebarGesture(mobile, setMobile);
+  const personal =
+    pathname.startsWith("/personal") ||
+    (pathname === "/abonnement" && session?.workspace === "PERSONAL");
   useEffect(() => {
     let alive = true;
-    api<Omit<Session, "can">>("/api/me")
+    api<Omit<Session, "can" | "company"> & { company: Row | null }>("/api/me")
       .then((data) => {
-        if (alive) setSession(data);
+        if (alive) {
+          setSession({ ...data, company: data.company ?? {} });
+          if (!data.company && !personal && pathname !== "/abonnement") router.replace("/personal");
+          if (personal && data.user.usageType === "BUSINESS") router.replace("/onboarding");
+        }
       })
       .catch((error) => {
         if (alive) {
@@ -186,15 +233,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => {
       alive = false;
     };
-  }, [router]);
+  }, [router, personal, pathname]);
   useEffect(() => {
-    if (!session) return;
+    if (!session || personal || session.workspace === "PERSONAL") return;
     api<{ items: Row[] }>("/api/notifications")
       .then((data) => setNotifications(data.items))
       .catch(() => {});
-  }, [session]);
+  }, [session, personal]);
   useEffect(() => {
-    if (query.trim().length < 2) return;
+    if (personal || query.trim().length < 2) return;
     let active = true;
     const timer = setTimeout(() => {
       setSearching(true);
@@ -213,7 +260,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       active = false;
       clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, personal]);
   const can = useCallback(
     (permission: string) =>
       !permission ||
@@ -228,14 +275,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <p>{error || "Ouverture de votre espace…"}</p>
       </div>
     );
-  const visible = navigation.filter((item) =>
+  const activeNavigation = personal ? personalNavigation : navigation;
+  const visible = activeNavigation.filter((item) =>
     item.href === "/saisie"
       ? can("expenses.create") ||
         (session.user.role === "SALESPERSON" ? can("payments.create") : can("cash.deposit"))
       : can(item.permission),
   );
-  const title = navigation.find((item) => item.href === pathname)?.label || "Votre espace";
-  const mobileLinks = ["/", "/journal", "/saisie", "/depenses"]
+  const title = activeNavigation.find((item) => item.href === pathname)?.label || "Votre espace";
+  const mobileLinks = (
+    personal
+      ? ["/personal", "/personal/transactions", "/personal/depenses", "/personal/budgets"]
+      : ["/", "/journal", "/saisie", "/depenses"]
+  )
     .map((href) => visible.find((item) => item.href === href))
     .filter((item) => item !== undefined);
   const initials = value(session.user, "name", "U")
@@ -253,7 +305,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setMobile(false)}
           />
         )}
-        <aside className={`sidebar ${mobile ? "is-open" : ""}`}>
+        <aside
+          ref={aside}
+          id="main-sidebar"
+          className={`sidebar ${mobile ? "is-open" : ""}`}
+          inert={compact && !mobile}
+          role={compact && mobile ? "dialog" : undefined}
+          aria-modal={compact && mobile ? true : undefined}
+          aria-label="Menu de navigation"
+        >
           <div className="sidebar-brand">
             <Brand />
             <button
@@ -264,14 +324,33 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <X size={20} />
             </button>
           </div>
-          <div className="company-switch">
-            <div className="company-avatar">{value(session.company, "name", "E")[0]}</div>
-            <div>
-              <strong>{value(session.company, "name")}</strong>
-              <span>Espace entreprise</span>
-            </div>
-            <ChevronDown size={14} />
-          </div>
+          <label className="workspace-selector">
+            <span>Votre espace</span>
+            <select
+              aria-label="Changer d’espace"
+              value={personal ? "personal" : value(session.company, "id", "personal")}
+              onChange={async (event) => {
+                try {
+                  const result = await post<{ redirectTo: string }>("/api/workspace", {
+                    companyId: event.target.value === "personal" ? null : event.target.value,
+                  });
+                  window.location.assign(result.redirectTo);
+                } catch (error) {
+                  setError(error instanceof Error ? error.message : "Changement impossible.");
+                }
+              }}
+            >
+              {session.user.usageType !== "BUSINESS" && (
+                <option value="personal">Mes finances personnelles</option>
+              )}
+              {session.memberships.map((member) => (
+                <option key={member.companyId} value={member.companyId}>
+                  {member.name} · Entreprise
+                </option>
+              ))}
+            </select>
+            {error && <small role="alert">{error}</small>}
+          </label>
           <section className="sidebar-appearance" aria-label="Apparence">
             <h2>Apparence</h2>
             <ThemeOptions />
@@ -299,7 +378,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Votre activité, en confiance.<small>Des opérations toujours traçables</small>
               </span>
             </div>
-            <button className="profile" onClick={() => router.push("/parametres")}>
+            <button
+              className="profile"
+              onClick={() => router.push(personal ? "/personal/parametres" : "/parametres")}
+            >
               <span className="avatar">{initials}</span>
               <span>
                 <strong>{value(session.user, "name")}</strong>
@@ -315,6 +397,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <button
                 className="icon-button mobile-only"
                 aria-label="Ouvrir le menu"
+                aria-controls="main-sidebar"
+                aria-expanded={mobile}
                 onClick={() => setMobile(true)}
               >
                 <Menu size={22} />
@@ -324,62 +408,68 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <strong>{title}</strong>
             </div>
             <div className="topbar-tools">
-              <button
-                className="icon-button mobile-search-toggle"
-                aria-label="Rechercher"
-                aria-expanded={mobileSearch}
-                onClick={() => setMobileSearch(!mobileSearch)}
-              >
-                <Search size={19} />
-              </button>
-              <div className={`global-search ${mobileSearch ? "mobile-search-open" : ""}`}>
-                <Search size={17} />
-                <input
-                  aria-label="Recherche globale"
-                  placeholder="Rechercher dans votre entreprise…"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-                {query.trim().length >= 2 && (
-                  <div className="search-results">
-                    <div className="dropdown-heading">
-                      {searching ? "Recherche…" : "Résultats de recherche"}
-                      <button
-                        className="icon-button"
-                        onClick={() => {
-                          setQuery("");
-                          setMobileSearch(false);
-                        }}
-                        aria-label="Fermer la recherche"
-                      >
-                        <X size={15} />
-                      </button>
-                    </div>
-                    {results.length ? (
-                      results.map((item, index) => (
-                        <Link
-                          key={value(item, "id", String(index))}
-                          href={value(item, "href", "/transactions")}
-                          onClick={() => setQuery("")}
-                        >
-                          <Search size={16} />
-                          <div>
-                            <strong>
-                              {value(item, "label", value(item, "name", value(item, "number")))}
-                            </strong>
-                            <small>{value(item, "type", "")}</small>
-                          </div>
-                          <ChevronRight size={15} />
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="muted">
-                        {searching ? "Recherche en cours…" : "Aucun résultat pour cette recherche."}
-                      </p>
+              {!personal && (
+                <>
+                  <button
+                    className="icon-button mobile-search-toggle"
+                    aria-label="Rechercher"
+                    aria-expanded={mobileSearch}
+                    onClick={() => setMobileSearch(!mobileSearch)}
+                  >
+                    <Search size={19} />
+                  </button>
+                  <div className={`global-search ${mobileSearch ? "mobile-search-open" : ""}`}>
+                    <Search size={17} />
+                    <input
+                      aria-label="Recherche globale"
+                      placeholder="Rechercher dans votre entreprise…"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                    {query.trim().length >= 2 && (
+                      <div className="search-results">
+                        <div className="dropdown-heading">
+                          {searching ? "Recherche…" : "Résultats de recherche"}
+                          <button
+                            className="icon-button"
+                            onClick={() => {
+                              setQuery("");
+                              setMobileSearch(false);
+                            }}
+                            aria-label="Fermer la recherche"
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                        {results.length ? (
+                          results.map((item, index) => (
+                            <Link
+                              key={value(item, "id", String(index))}
+                              href={value(item, "href", "/transactions")}
+                              onClick={() => setQuery("")}
+                            >
+                              <Search size={16} />
+                              <div>
+                                <strong>
+                                  {value(item, "label", value(item, "name", value(item, "number")))}
+                                </strong>
+                                <small>{value(item, "type", "")}</small>
+                              </div>
+                              <ChevronRight size={15} />
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="muted">
+                            {searching
+                              ? "Recherche en cours…"
+                              : "Aucun résultat pour cette recherche."}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
               <ThemePicker />
               <div className="notification-wrap">
                 <button
@@ -434,15 +524,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </header>
-          <main className="main-content">{children}</main>
+          <main className="main-content">
+            {!personal && session.workspace === "PERSONAL" && pathname !== "/abonnement" ? (
+              <p>Ouverture de votre espace personnel…</p>
+            ) : (
+              children
+            )}
+          </main>
           <footer className="app-footer">
-            <span>© {new Date().getFullYear()} Orange · Gestion d’entreprise</span>
+            <span>
+              © {new Date().getFullYear()} {APP_BRAND_NAME} ·{" "}
+              {personal ? "Finances personnelles" : "Gestion d’entreprise"}
+            </span>
             <span>
               <span className="live-dot" /> Espace sécurisé
             </span>
           </footer>
         </div>
-        <nav className="mobile-bottom-nav" aria-label="Navigation mobile">
+        <nav
+          className="mobile-bottom-nav"
+          data-workspace={personal ? "PERSONAL" : "BUSINESS"}
+          aria-label="Navigation mobile"
+        >
           {mobileLinks.map((n) => (
             <Link
               key={n.href}

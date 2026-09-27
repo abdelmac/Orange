@@ -5,7 +5,7 @@ import { HttpError } from "@/lib/http";
 import { assertPermission, cashScope, clientScope, hasPermission } from "@/lib/rbac";
 import { parseMoney } from "@/lib/money";
 import { uuid } from "@/lib/validation";
-import { publicUserSelect } from "@/lib/user-select";
+import { companyUserSelect } from "@/lib/user-select";
 import { expenseScope, invoiceScope, paymentScope, transactionScope } from "@/lib/record-access";
 import { withTransactionLabels } from "./transaction-labels.service";
 import { transactionSearch } from "./daybook.service";
@@ -182,12 +182,17 @@ export async function listDirectory(
     assertPermission(actor, "users.view");
     return (
       await db.user.findMany({
-        where: { companyId, ...search(params, ["name", "email"]) },
-        select: publicUserSelect,
+        where: { memberships: { some: { companyId } }, ...search(params, ["name", "email"]) },
+        select: companyUserSelect(companyId),
         orderBy: { name: "asc" },
         ...paging,
       })
-    ).map((item) => ({ ...item, role: item.roles[0]?.role.name, roleId: item.roles[0]?.role.id }));
+    ).map((item) => ({
+      ...item,
+      active: item.memberships[0]?.active ?? false,
+      role: item.roles[0]?.role.name,
+      roleId: item.roles[0]?.role.id,
+    }));
   }
   if (collection === "roles") {
     assertPermission(actor, "users.view");
@@ -215,7 +220,8 @@ export async function listDirectory(
             name: true,
             email: true,
             active: true,
-            _count: { select: { clients: true } },
+            memberships: { where: { companyId }, select: { active: true } },
+            _count: { select: { clients: { where: { companyId } } } },
           },
         },
       },
@@ -226,7 +232,7 @@ export async function listDirectory(
         id: item.userId,
         name: item.user.name,
         email: item.user.email,
-        active: item.user.active,
+        active: item.user.active && (item.user.memberships[0]?.active ?? false),
       }));
     const ids = people.map((item) => item.userId);
     const [incoming, outgoing, sales, handovers, collections, quickCollections] = await Promise.all(
@@ -283,6 +289,7 @@ export async function listDirectory(
       return {
         ...item,
         ...item.user,
+        active: item.user.active && (item.user.memberships[0]?.active ?? false),
         id: item.userId,
         profileId: item.id,
         heldMinor: incomingMinor - spentMinor,
@@ -364,6 +371,7 @@ export async function listDirectory(
   if (collection === "invoices") {
     assertPermission(actor, "invoices.view");
     const items = await db.invoice.findMany({
+      omit: { customizationSnapshot: true },
       where: {
         AND: [
           invoiceScope(actor),
@@ -525,6 +533,7 @@ export async function getDirectoryItem(actor: Actor, collection: string, id: str
           take: 100,
         },
         invoices: {
+          omit: { customizationSnapshot: true },
           where: {
             ...invoiceScope(actor),
             ...(!hasPermission(actor, "invoices.view") ? { id: { in: [] } } : {}),
@@ -600,7 +609,11 @@ export async function getDirectoryItem(actor: Actor, collection: string, id: str
     }
   } else if (collection === "users") {
     assertPermission(actor, "users.view");
-    item = await db.user.findFirst({ where: { companyId, id }, select: publicUserSelect });
+    const member = await db.user.findFirst({
+      where: { id, memberships: { some: { companyId } } },
+      select: companyUserSelect(companyId),
+    });
+    item = member ? { ...member, active: member.memberships[0]?.active ?? false } : null;
   } else if (collection === "salespeople") {
     assertPermission(actor, "salespeople.view");
     if (actor.role === "SALESPERSON" && id !== actor.id)
@@ -678,6 +691,7 @@ export async function getDirectoryItem(actor: Actor, collection: string, id: str
   } else if (collection === "invoices") {
     assertPermission(actor, "invoices.view");
     const result = await db.invoice.findFirst({
+      omit: { customizationSnapshot: true },
       where: { ...invoiceScope(actor), id },
       include: {
         ...includes.invoice,

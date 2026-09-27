@@ -9,11 +9,11 @@ import {
   UsersRound,
 } from "lucide-react";
 import { InfoSection, PublicInfo } from "@/components/public-info";
+import { APP_NAME } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Confidentialité",
-  description:
-    "Comment Orange Finance utilise les informations de compte, les opérations professionnelles et les justificatifs privés.",
+  description: `Comment ${APP_NAME} utilise les informations de compte, les opérations et les justificatifs privés.`,
 };
 
 export default function ConfidentialitePage() {
@@ -22,7 +22,7 @@ export default function ConfidentialitePage() {
       current="confidentialite"
       eyebrow="Vos informations, dans leur contexte"
       title="Comprendre l’usage de vos données."
-      description="Orange Finance sert à suivre les opérations financières et commerciales d’une entreprise. Cette page décrit les informations utilisées par le service et les moyens de nous contacter."
+      description={`${APP_NAME} permet de suivre les finances professionnelles et personnelles dans des espaces séparés. Cette page décrit les informations utilisées par le service et les moyens de nous contacter.`}
     >
       <InfoSection
         title="Un accès organisé par votre entreprise"
@@ -39,6 +39,23 @@ export default function ConfidentialitePage() {
           L’assistance technique est joignable depuis la{" "}
           <Link href="/assistance">page d’assistance</Link>. Une demande concernant vos données peut
           également y être transmise pour examen avec l’entreprise concernée.
+        </p>
+      </InfoSection>
+
+      <InfoSection
+        title="Votre espace personnel et votre abonnement"
+        icon={<ShieldCheck size={21} />}
+      >
+        <p>
+          Les comptes, revenus, dépenses, budgets et justificatifs personnels sont associés à votre
+          identité. Les autres membres et administrateurs de votre entreprise ne peuvent pas les
+          consulter. Le retrait d’une équipe ne supprime pas votre espace personnel.
+        </p>
+        <p>
+          Si vous souscrivez à PRO, Stripe traite le paiement de l’abonnement. Le service conserve
+          les identifiants du client et de l’abonnement, son statut et ses dates ; les numéros de
+          carte ne sont pas stockés dans l’application. Pour une demande concernant votre espace
+          personnel, contactez directement l’assistance.
         </p>
       </InfoSection>
 
@@ -81,9 +98,9 @@ export default function ConfidentialitePage() {
           service et à la résolution des incidents.
         </p>
         <p>
-          Orange Finance n’intègre pas de publicité ni d’outil de suivi publicitaire. Il enregistre
-          les mouvements déclarés par les utilisateurs ; il n’exécute pas de virements bancaires et
-          ne traite pas de paiements par carte.
+          {APP_NAME} n’intègre pas de publicité ni d’outil de suivi publicitaire. Il enregistre les
+          mouvements déclarés par les utilisateurs et n’exécute pas de virements bancaires. Le
+          paiement de l’abonnement PRO utilise la page de paiement hébergée par Stripe.
         </p>
       </InfoSection>
 
@@ -103,7 +120,7 @@ export default function ConfidentialitePage() {
         <p>
           Lorsqu’un utilisateur exporte un rapport ou partage un PDF, la copie est remise au
           destinataire ou à l’application qu’il choisit. L’accès à cette copie ne dépend plus des
-          permissions Orange Finance. Les prestataires techniques nécessaires à l’hébergement et,
+          permissions {APP_NAME}. Les prestataires techniques nécessaires à l’hébergement et,
           lorsqu’il est configuré, à l’envoi des emails interviennent dans le fonctionnement du
           service.
         </p>

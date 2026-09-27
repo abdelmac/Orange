@@ -58,7 +58,7 @@ async function fixture() {
           name: `UI ${source.label}`,
           email: `${source.name.toLowerCase()}-${run}@browser.test`,
           passwordHash,
-          roles: { create: { roleId: role.id } },
+          roles: { create: { companyId: company.id, roleId: role.id } },
         },
       });
   }

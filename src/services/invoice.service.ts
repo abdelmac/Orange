@@ -14,6 +14,8 @@ import {
   requirePermission,
 } from "../lib/finance-context";
 import { audit } from "./audit.service";
+import { createInvoicePresentation } from "./invoice-customization.service";
+import { formatInvoiceNumber } from "../lib/invoice-customization";
 
 const saleInput = z.object({
   clientId: idInput,
@@ -38,7 +40,7 @@ export async function createSale(actor: Actor, raw: unknown) {
           idempotencyKey: input.idempotencyKey,
         },
       },
-      include: { lines: true, invoice: true },
+      include: { lines: true, invoice: { omit: { customizationSnapshot: true } } },
     });
     if (prior) {
       assertIdempotentOwner(actor, prior.createdById);
@@ -63,9 +65,10 @@ export async function createSale(actor: Actor, raw: unknown) {
         throw new BusinessError("La limite de crédit de ce client serait dépassée.");
     }
     const date = input.date ? new Date(input.date) : new Date();
+    const presentation = await createInvoicePresentation(tx, actor.companyId);
     const dueDate = input.dueDate
       ? new Date(input.dueDate)
-      : new Date(date.getTime() + 30 * 86400000);
+      : new Date(date.getTime() + presentation.settings.defaultDueDays * 86400000);
     if (dueDate < date) throw new BusinessError("L’échéance doit suivre la date de facture.");
     const currency = await companyCurrency(tx, actor.companyId);
     const { lines, ...totals } = calculated;
@@ -75,7 +78,7 @@ export async function createSale(actor: Actor, raw: unknown) {
       salespersonId,
       date,
       currency,
-      notes: input.notes,
+      notes: input.notes?.trim() || presentation.settings.defaultNotes,
       createdById: actor.id,
       ...totals,
     };
@@ -92,9 +95,10 @@ export async function createSale(actor: Actor, raw: unknown) {
       data: {
         ...common,
         saleId: sale.id,
-        number: await nextNumber(tx, actor.companyId, "FAC", date),
+        number: await nextInvoiceNumber(tx, actor.companyId, date, presentation.settings),
         dueDate,
-        terms: input.terms,
+        terms: input.terms?.trim() || presentation.settings.terms,
+        customizationSnapshot: presentation,
         status: "ISSUED",
         lines: { create: lines },
       },
@@ -109,13 +113,31 @@ export async function createSale(actor: Actor, raw: unknown) {
       action: "ISSUE",
       entity: "Invoice",
       entityId: invoice.id,
-      after: invoice,
+      after: {
+        ...invoice,
+        customizationSnapshot: {
+          ...presentation,
+          logoBase64: presentation.logoBase64 ? "[logo archivé avec la facture]" : null,
+        },
+      },
     });
     return tx.sale.findUniqueOrThrow({
       where: { id: sale.id },
-      include: { lines: true, invoice: true },
+      include: { lines: true, invoice: { omit: { customizationSnapshot: true } } },
     });
   });
+}
+
+async function nextInvoiceNumber(
+  tx: import("../lib/finance-context").Tx,
+  companyId: string,
+  date: Date,
+  settings: import("../lib/invoice-customization").InvoiceCustomizationSettings,
+) {
+  // Always share the original FAC sequence, including across prefix/template changes.
+  // Unique tenant+number and serializable retries protect simultaneous invoice creation.
+  const standard = await nextNumber(tx, companyId, "FAC", date);
+  return formatInvoiceNumber(Number(standard.split("-").at(-1)), date.getUTCFullYear(), settings);
 }
 
 export async function syncInvoice(
