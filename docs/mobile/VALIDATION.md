@@ -2,7 +2,15 @@
 
 Preuves techniques initiales du **16 septembre 2026**, conservées ci-dessous avec leurs versions de source. Les projets sont reliés au serveur HTTPS existant ; aucune donnée financière de test n’a été créée dans la production pendant cette préparation. Il s’agit d’une préparation technique à la publication, pas d’une disponibilité dans les boutiques.
 
-## Mise à jour du 11 octobre 2026
+## Renommage Orando — 11 octobre 2026
+
+Les noms affichés sur Android et iOS, les libellés de partage et d’impression et le visuel Google Play deviennent **Orando Finance**. Les identifiants `com.ennearock.orangefinance`, les cibles natives et le marqueur `OrangeFinanceNative` sont conservés pour assurer la continuité des applications existantes.
+
+Le [workflow de la révision renommée](https://github.com/abdelmac/Orange/actions/runs/38159307940) utilise la source `c0465e1fa3c1d7019a4b2eaca62adaed5dca00bd`. Le job [Android](https://github.com/abdelmac/Orange/actions/runs/38159307940/job/114528692692) a réussi les tests unitaires, le lint, la compilation APK debug et le bundle release. Le job [iOS](https://github.com/abdelmac/Orange/actions/runs/38159307940/job/114528692864) a réussi les compilations simulateur Debug et appareil Release, les tests unitaires iPhone et le test UI de connexion native. La compilation appareil n’utilise pas de signature de distribution.
+
+Le site et les pages publiques renommés sont déployés et vérifiés en production, comme décrit dans [DEPLOYMENT.md](../../DEPLOYMENT.md). Aucun binaire n’a été envoyé à une boutique pour ce renommage. Les achats natifs et les autres prérequis de publication ci-dessous restent à réaliser.
+
+## Choix de publication confirmés — 11 octobre 2026
 
 Le titulaire confirme un compte Apple Developer individuel activé depuis le 26 septembre et, le 11 octobre, un compte Google Play Console personnel activé. Ces déclarations n’ont pas été vérifiées par API. Il choisit l’achat de PRO directement dans les applications iOS et Android. Aucun produit d’abonnement des boutiques n’a été créé par cette mise à jour documentaire.
 
