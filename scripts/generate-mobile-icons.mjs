@@ -37,6 +37,6 @@ await sharp(await readFile(path.join(root, "docs/mobile/assets/play-feature.svg"
   .toFile(path.join(root, "docs/mobile/assets/play-feature-1024x500.png"));
 await writeFile(
   path.join(root, "docs/mobile/assets/README.md"),
-  "# Visuels mobiles\n\nGénérés par `node scripts/generate-mobile-icons.mjs`. Icônes opaques issues de `public/icon.svg` : Apple 1024 × 1024 et Google Play 512 × 512. La bannière Google Play 1024 × 500 est issue de `play-feature.svg` ; elle illustre les fonctions du produit, ce n’est pas une capture d’écran.\n\nLes captures doivent provenir des applications natives réellement exécutées. Le nom et la marque restent à confirmer avant publication.\n",
+  "# Visuels mobiles\n\nGénérés par `node scripts/generate-mobile-icons.mjs`. Icônes opaques issues de `public/icon.svg` : Apple 1024 × 1024 et Google Play 512 × 512. La bannière Google Play 1024 × 500 est issue de `play-feature.svg` ; elle illustre les fonctions du produit, ce n’est pas une capture d’écran.\n\nLes captures doivent provenir des applications natives réellement exécutées. Le nom Orando Finance a été confirmé par le titulaire le 11 octobre 2026 ; vérifier sa disponibilité dans les boutiques avant publication.\n",
 );
 console.log("Icônes Android, iOS et boutiques générées.");

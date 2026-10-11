@@ -1,6 +1,6 @@
 {
   "status": "draft_not_for_automatic_submission",
-  "reviewed_at": "2026-09-16",
+  "reviewed_at": "2026-10-11",
   "locale": "fr-FR",
   "publisher": {
     "legal_name": null,
@@ -17,27 +17,39 @@
     "apple_enrollment_type_confirmed_at": "2026-09-26",
     "apple_developer_account_available": true,
     "apple_developer_account_status_source": "owner_confirmed_2026-09-26_not_api_verified",
-    "google_play_account_available": false
+    "google_play_account_available": true,
+    "google_play_account_type": "personal",
+    "google_play_account_status_source": "owner_confirmed_2026-10-11_not_api_verified"
   },
   "application": {
-    "name": "Orange Finance",
-    "name_confirmed": false,
+    "name": "Orando Finance",
+    "name_confirmed": true,
+    "name_confirmed_at": "2026-10-11",
+    "name_confirmation_source": "owner_requested_rebrand_to_orando",
     "bundle_id_candidate": "com.ennearock.orangefinance",
     "bundle_id_confirmed": false,
     "service_origin": "https://orange-finance.onrender.com",
-    "distribution_candidate": "public_with_organization_login",
+    "distribution_candidate": "public_with_account_login",
     "distribution_confirmed": false,
-    "price_candidate": "free_download_existing_business_account_required",
+    "price_candidate": "free_download_optional_native_pro_subscription",
     "price_confirmed": false,
     "category_candidate": "BUSINESS",
-    "account_model": "administrator_provisioned_no_public_self_registration",
+    "account_model": "public_registration_personal_business_or_both_and_team_invitations",
+    "native_purchase_requested": true,
+    "native_purchase_confirmed_at": "2026-10-11",
+    "native_purchase_status": "pending_implementation_and_store_configuration",
+    "pro_scope": "selected_business_owner_managed_personal_remains_free",
+    "apple_product_id_candidate": "com.ennearock.orangefinance.pro.monthly",
+    "google_product_id_candidate": "orange_finance_pro",
+    "google_base_plan_id_candidate": "monthly",
+    "store_product_ids_confirmed": false,
     "ads": false,
     "analytics_sdk": false,
-    "processes_bank_or_card_payments": false,
+    "business_ledger_executes_bank_or_card_payments": false,
     "financial_writes_require_network": true
   },
   "apple": {
-    "name": "Orange Finance",
+    "name": "Orando Finance",
     "subtitle": "Caisse, dépenses et reçus",
     "keywords": "caisse,dépenses,encaissements,reçus,factures,entreprise,commercial,journal",
     "promotional_text": "Retrouvez les encaissements, dépenses, justificatifs et reçus de votre entreprise dans une interface conçue pour le travail quotidien.",
@@ -49,7 +61,7 @@
     "age_rating": null
   },
   "google_play": {
-    "title": "Orange Finance",
+    "title": "Orando Finance",
     "short_description": "Suivez encaissements, dépenses et caisses avec votre équipe.",
     "target_sdk_minimum": 36,
     "package_name_confirmed": false,
@@ -58,19 +70,22 @@
     "financial_features_declaration": null,
     "data_safety_declaration": null
   },
-  "full_description": "Orange Finance accompagne les équipes dans le suivi quotidien de l’argent de leur entreprise. Un compte professionnel fourni par votre administrateur est nécessaire.\n\nEnregistrez un encaissement avec ou sans facture, retrouvez les opérations dans le journal quotidien et consultez les montants disponibles dans vos caisses ou votre portefeuille commercial. Le nom de la personne et le motif identifient chaque saisie ; le téléphone reste facultatif.\n\nCréez des demandes de dépenses, ajoutez un justificatif et suivez leur validation puis leur paiement. Les accès dépendent des autorisations attribuées par l’entreprise : administrateur, responsable, comptable, caissier, commercial ou employé.\n\nRetrouvez vos clients, ventes, factures et paiements partiels. Téléchargez les reçus PDF et consultez l’historique des mouvements. Les corrections financières conservent la trace de l’opération initiale et de son annulation.\n\nUne connexion Internet est nécessaire. Orange Finance enregistre les opérations déclarées par votre entreprise ; l’application n’exécute pas de virements bancaires et ne traite pas les paiements par carte. Les fonctionnalités visibles varient selon votre rôle.\n\nAssistance : ennearock@gmail.com.",
+  "full_description": "Orando Finance vous accompagne dans le suivi quotidien de vos finances personnelles et de votre entreprise. Créez gratuitement votre compte pour un usage personnel, professionnel ou les deux, ou rejoignez une équipe sur invitation.\n\nEnregistrez un encaissement avec ou sans facture, retrouvez les opérations dans le journal et consultez vos caisses. Créez des demandes de dépenses, joignez vos justificatifs et suivez leur validation. Retrouvez clients, ventes, factures, paiements partiels et reçus PDF selon vos permissions.\n\nDans votre espace personnel, suivez revenus, dépenses, comptes et budgets. L’offre FREE permet de commencer gratuitement ; PRO ajoute notamment la personnalisation des factures, la gestion d’équipe et les rapports avancés pour l’entreprise sélectionnée.\n\nUne connexion Internet est nécessaire. Le registre enregistre les opérations déclarées ; il n’exécute pas de virements ni de paiements bancaires pour vos clients. L’abonnement au logiciel est distinct des mouvements enregistrés.\n\nAssistance : ennearock@gmail.com.",
+  "description_status": "draft_native_purchase_price_and_terms_to_complete_after_implementation",
   "review_access": {
     "status": "dedicated_hosted_demo_company_required",
     "credentials_location": "store_console_private_review_fields_only",
     "credentials_in_repository": false,
     "native_features_validation": "pending_device_recipe",
-    "account_deletion_scope_review": "required_for_final_native_and_webview_flows"
+    "account_deletion_scope_review": "required_public_registration_present_self_service_flow_pending"
   },
   "publication_blockers": [
     "publisher_legal_identity",
     "developer_accounts_and_verification",
-    "final_name_identifier_and_distribution",
+    "final_identifier_distribution_and_brand_rights",
     "release_signing",
+    "native_iap_implementation_server_verification_and_sandbox_tests",
+    "store_products_paid_agreements_and_merchant_setup",
     "public_support_and_privacy_urls",
     "final_privacy_retention_and_deletion_declarations",
     "native_device_recipe_and_real_screenshots",

@@ -227,7 +227,7 @@ class MainActivity : AppCompatActivity() {
                 Triple("Paramètres", "/parametres", "dashboard.view"),
             )).filter { it.third.isEmpty() || it.third in permissions } + Triple("Mes espaces et mon profil", "/onboarding", "")
             val labels = modules.map { it.first } + "Se déconnecter"
-            AlertDialog.Builder(this).setTitle("Orange Finance")
+            AlertDialog.Builder(this).setTitle("Orando Finance")
                 .setItems(labels.toTypedArray()) { _, index ->
                     if (index < modules.size) navigate(modules[index].second) else confirmLogout()
                 }.setNegativeButton("Fermer", null).show()
@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
     private fun openExternal(url: String) {
         if (AppPolicy.externalScheme(url) == null) return
         AlertDialog.Builder(this).setTitle("Ouvrir une autre application ?")
-            .setMessage("Ce lien va s’ouvrir en dehors d’Orange Finance.")
+            .setMessage("Ce lien va s’ouvrir en dehors d’Orando Finance.")
             .setNegativeButton("Annuler", null).setPositiveButton("Ouvrir") { _, _ ->
                 try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)) }
                 catch (_: Exception) { message("Aucune application ne permet d’ouvrir ce lien.") }

@@ -1,4 +1,4 @@
-# Orange Finance pour iPhone et iPad
+# Orando Finance pour iPhone et iPad
 
 Application UIKit/Swift pour iOS 16 et ultérieur, à compiler avec Xcode 26. Le serveur utilisé est exclusivement `https://orange-finance.onrender.com`. Aucun secret, mot de passe de démonstration ou jeton de connexion n’est intégré au binaire.
 

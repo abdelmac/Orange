@@ -1,12 +1,12 @@
 # Préparer la connexion à un ERP comptable
 
-Orange conserve le registre des mouvements. Le futur ERP pourra assurer la comptabilité générale, les plans de comptes, rapprochements, déclarations et clôtures. Aucun fournisseur ERP ni compte comptable n’est imposé à ce stade.
+Orando conserve le registre des mouvements. Le futur ERP pourra assurer la comptabilité générale, les plans de comptes, rapprochements, déclarations et clôtures. Aucun fournisseur ERP ni compte comptable n’est imposé à ce stade.
 
 ## Export disponible
 
 `GET /api/integrations/accounting/export?from=2026-09-11T22%3A00%3A00.000Z&to=2026-09-12T22%3A00%3A00.000Z&page=1&pageSize=250`
 
-Authentification par la session privée Orange, contrôles serveur `reports.export` et `transactions.view`, isolation de l’entreprise et du périmètre du collaborateur. Aucun accès anonyme ou clé intégrée au navigateur. Chaque téléchargement est audité. Les bornes ISO incluent `from` et excluent `to` ; maximum 366 jours. Le journal utilise les minuits du fuseau de l’appareil, y compris lors d’un changement d’heure.
+Authentification par la session privée Orando, contrôles serveur `reports.export` et `transactions.view`, isolation de l’entreprise et du périmètre du collaborateur. Aucun accès anonyme ou clé intégrée au navigateur. Chaque téléchargement est audité. Les bornes ISO incluent `from` et excluent `to` ; maximum 366 jours. Le journal utilise les minuits du fuseau de l’appareil, y compris lors d’un changement d’heure.
 
 La réponse utilise `schemaVersion: "orange.accounting.v1"` :
 
@@ -32,4 +32,4 @@ Cet endpoint est un export paginé, pas une synchronisation automatique. La lect
 
 Avant d’activer des échanges automatiques : définir le mapping des caisses/portefeuilles et tiers vers l’ERP ; ajouter des comptes de service à portée explicite et des secrets conservés côté serveur ; enregistrer une file d’événements dans la même transaction SQL que les écritures ; traiter les reprises avec identifiant d’événement unique, accusé de réception et journal des erreurs ; prévoir une réconciliation et une supervision. Les appels réseau devront rester en dehors de la transaction financière. Les annulations produiront une contre-écriture dans l’ERP, jamais une suppression.
 
-Les noms libres de chauffeurs et autres bénéficiaires ne créent pas de comptes utilisateurs. Ils désignent le tiers de l’opération et ne lui donnent aucun accès à Orange. Le reçu PDF privé peut lui être remis par téléchargement ou impression par un collaborateur autorisé. Aucun SMS ni envoi à un tiers n’est automatique.
+Les noms libres de chauffeurs et autres bénéficiaires ne créent pas de comptes utilisateurs. Ils désignent le tiers de l’opération et ne lui donnent aucun accès à Orando. Le reçu PDF privé peut lui être remis par téléchargement ou impression par un collaborateur autorisé. Aucun SMS ni envoi à un tiers n’est automatique.

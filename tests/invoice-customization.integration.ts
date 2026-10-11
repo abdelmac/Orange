@@ -91,7 +91,7 @@ async function main() {
     assert.equal(stored.number, "FAC-2026-000001");
     const pdf = await invoicePdf(actor, stored.id);
     assert.equal(pdf.headers.get("cache-control"), "private, no-store");
-    assert.equal((await PDFDocument.load(await pdf.arrayBuffer())).getCreator(), "Orange Finance");
+    assert.equal((await PDFDocument.load(await pdf.arrayBuffer())).getCreator(), "Orando Finance");
   });
   const pro = await ensurePlan("PRO");
   await db.subscription.create({
@@ -197,7 +197,7 @@ async function main() {
       const preview = await invoicePreview(actor, settings);
       assert.equal(
         (await PDFDocument.load(await preview.arrayBuffer())).getCreator(),
-        "Orange Finance",
+        "Orando Finance",
       );
     },
   );

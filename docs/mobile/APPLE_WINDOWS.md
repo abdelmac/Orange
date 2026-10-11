@@ -1,10 +1,10 @@
 # Publier sur TestFlight depuis Windows
 
-État au 26 septembre 2026 : le propriétaire confirme son compte Apple Developer **Individual** activé et le Team ID **KDHSLMD5LF**. Aucun D-U-N-S ni Mac personnel n’est nécessaire pour ce parcours. Le nom légal apparaîtra comme vendeur. Le nom **Orange Finance** et le bundle ID **com.ennearock.orangefinance** restent à confirmer avant de les enregistrer chez Apple.
+État au 26 septembre 2026 : le propriétaire confirme son compte Apple Developer **Individual** activé et le Team ID **KDHSLMD5LF**. Aucun D-U-N-S ni Mac personnel n’est nécessaire pour ce parcours. Le nom légal apparaîtra comme vendeur. Le nom **Orando Finance** a ensuite été confirmé par le propriétaire le 11 octobre 2026. Le bundle ID **com.ennearock.orangefinance** reste à confirmer avant son enregistrement chez Apple.
 
 Le workflow manuel `iOS — signed release and TestFlight` compile sur les machines macOS de GitHub. Les essais de compilation existants sont indépendants de ce workflow. Une exécution signée et un envoi Apple restent à valider avec les vrais certificats ; aucun build TestFlight n’a encore été envoyé par cette préparation.
 
-La demande de certificat est déjà générée sur la machine de travail : `.local/apple-signing/distribution.certSigningRequest`, avec le libellé interne `Orange Finance Distribution` et l’email de support confirmé. Transmettre ce fichier à Apple à l’étape 2 ; ne pas régénérer la clé existante. Ce libellé de demande ne renseigne ni ne remplace l’identité légale du titulaire chez Apple.
+La demande de certificat est déjà générée sur la machine de travail : `.local/apple-signing/distribution.certSigningRequest`, avec le libellé interne historique `Orange Finance Distribution` et l’email de support confirmé. Transmettre ce fichier à Apple à l’étape 2 ; ne pas régénérer la clé existante. Ce libellé de demande ne renseigne ni ne remplace l’identité légale du titulaire chez Apple.
 
 ## 1. Identifiant et fiche Apple
 
@@ -52,7 +52,7 @@ Le nom du fichier téléchargé peut différer : adapter la première ligne.
 
 ## 4. Clé pour l’envoi à Apple
 
-Dans **App Store Connect → Utilisateurs et accès → Intégrations → App Store Connect API**, demander l’accès à l’API si ce bouton est affiché, puis créer une **clé d’équipe / Team Key**, nommée par exemple `Orange GitHub TestFlight`, avec le rôle **App Manager / Gestionnaire d’apps**. Cette clé sert seulement à l’envoi, sans création automatique de certificats ou de profils.
+Dans **App Store Connect → Utilisateurs et accès → Intégrations → App Store Connect API**, demander l’accès à l’API si ce bouton est affiché, puis créer une **clé d’équipe / Team Key**, nommée par exemple `Orando GitHub TestFlight`, avec le rôle **App Manager / Gestionnaire d’apps**. Cette clé sert seulement à l’envoi, sans création automatique de certificats ou de profils.
 
 Un abonnement Apple **Individual** et une **Individual API Key** désignent deux choses différentes. Ce workflow attend une **Team Key**, son **Key ID**, son **Issuer ID** et le fichier privé `.p8`. Ne pas confondre Issuer ID et Team ID. La clé est téléchargeable une seule fois et porte sur les apps autorisées par son rôle dans le compte.
 

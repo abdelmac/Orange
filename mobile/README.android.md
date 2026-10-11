@@ -1,4 +1,4 @@
-# Orange Finance — Android
+# Orando Finance — Android
 
 Application native Kotlin pour Android 8 et versions suivantes, identifiant `com.ennearock.orangefinance`, version `1.0.0` (code `1`). L’application se connecte exclusivement à `https://orange-finance.onrender.com`.
 
@@ -47,7 +47,7 @@ Le chemin désigne un keystore privé extérieur au dépôt. Fournir une configu
 - Les PDF sont limités aux routes de reçus, factures, justificatifs et exports PDF explicitement autorisés de cette origine. Seul le cookie de session est envoyé, les redirections sont refusées, les téléchargements sont plafonnés à 20 Mo et les PDF doivent commencer par `%PDF-`.
 - Les fichiers restent dans des sous-dossiers privés du cache. Le partage utilise FileProvider avec une autorisation de lecture temporaire. Ce cache est purgé au lancement et à la déconnexion. Une application choisie explicitement pour le partage peut conserver sa propre copie.
 - La sauvegarde et le transfert des données sont désactivés. `FLAG_SECURE` masque les captures et l’aperçu du sélecteur d’applications.
-- La photo utilise l’application photo du système, sans permission caméra demandée par Orange Finance. Aucun accès général au stockage n’est demandé. Les justificatifs sélectionnés sont copiés dans un cache privé et limités à 10 Mo, puis revérifiés par le serveur.
+- La photo utilise l’application photo du système, sans permission caméra demandée par Orando Finance. Aucun accès général au stockage n’est demandé. Les justificatifs sélectionnés sont copiés dans un cache privé et limités à 10 Mo, puis revérifiés par le serveur.
 
 ## Vérification avant livraison
 

@@ -18,7 +18,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         let cover = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
         cover.frame = window.bounds; cover.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         cover.contentView.backgroundColor = .systemBackground
-        let label = UILabel(); label.text = "Orange Finance"; label.font = .preferredFont(forTextStyle: .title1)
+        let label = UILabel(); label.text = "Orando Finance"; label.font = .preferredFont(forTextStyle: .title1)
         label.textColor = .secondaryLabel; label.translatesAutoresizingMaskIntoConstraints = false
         cover.contentView.addSubview(label)
         NSLayoutConstraint.activate([label.centerXAnchor.constraint(equalTo: cover.contentView.centerXAnchor), label.centerYAnchor.constraint(equalTo: cover.contentView.centerYAnchor)])

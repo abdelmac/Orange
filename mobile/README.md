@@ -10,7 +10,7 @@ Les applications se connectent à `https://orange-finance.onrender.com`. Le serv
 - Les montants sont transmis comme chaînes décimales. Une saisie reçoit une clé d’idempotence réutilisée lors d’une reprise explicite. Aucune écriture financière n’est mise en file hors ligne.
 - Les documents privés sont téléchargés seulement depuis les routes autorisées du serveur, avec contrôle de taille et refus des redirections. Les copies temporaires servent au partage demandé par l’utilisateur. Les copies transmises à une autre application restent sous le contrôle de cette application.
 
-Le nom « Orange Finance » reprend l’application existante. L’identifiant `com.ennearock.orangefinance` est une proposition à confirmer **avant la première publication**, avec l’identité légale de l’éditeur et le mode de distribution. Le contact d’assistance confirmé est `ennearock@gmail.com`.
+Le nom « Orando Finance » correspond au changement de marque demandé le 11 octobre 2026. L’identifiant `com.ennearock.orangefinance` est une proposition à confirmer **avant la première publication**, avec l’identité légale de l’éditeur et le mode de distribution. Le contact d’assistance confirmé est `ennearock@gmail.com`.
 
 ## Compiler et tester
 
@@ -20,7 +20,7 @@ Les artefacts attendus sont un APK Android de développement installable pour es
 
 L’APK de développement se connecte au service réel : utiliser un compte et une entreprise de test pour toute saisie. Ne jamais exécuter le scénario de recette financière dans les données métier d’une entreprise réelle.
 
-Les clés Android, certificats Apple, profils et fichiers de signature doivent rester hors Git. Le titulaire confirme le 26 septembre 2026 son compte Apple Developer individuel activé ; le compte Google reste à confirmer. Le [parcours Apple depuis Windows](../docs/mobile/APPLE_WINDOWS.md) prépare la signature et l’envoi manuel TestFlight sur GitHub macOS. Le dossier [publication boutiques](../docs/mobile/STORES.md) décrit les démarches restantes, les déclarations de confidentialité et la recette sur appareils. L’acceptation appartient aux boutiques.
+Les clés Android, certificats Apple, profils et fichiers de signature doivent rester hors Git. Le titulaire confirme le 26 septembre 2026 son compte Apple Developer individuel activé ; le compte Google Play personnel est confirmé le 11 octobre 2026. Le [parcours Apple depuis Windows](../docs/mobile/APPLE_WINDOWS.md) prépare la signature et l’envoi manuel TestFlight sur GitHub macOS. Le dossier [publication boutiques](../docs/mobile/STORES.md) décrit les démarches restantes, les déclarations de confidentialité et la recette sur appareils. L’acceptation appartient aux boutiques.
 
 ## Icônes
 

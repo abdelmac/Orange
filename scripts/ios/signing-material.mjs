@@ -195,7 +195,7 @@ function main() {
     "-in",
     pem,
     "-name",
-    "Orange Finance distribution",
+    "Orando Finance distribution",
     "-out",
     p12,
     "-passout",

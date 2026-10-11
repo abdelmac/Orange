@@ -1,10 +1,12 @@
-# Orange — gestion financière et commerciale
+# Orando — gestion financière et commerciale
 
 Application française de gestion des ventes, factures, encaissements, caisses et dépenses d’une petite entreprise. Les formulaires enregistrent réellement leurs données dans PostgreSQL. Les permissions sont vérifiées sur le serveur et chaque opération est rattachée à une entreprise.
 
 L’inscription gratuite propose maintenant un espace **Entreprise**, **Personnel**, ou **Les deux**. FREE fonctionne sans carte bancaire. **PRO, 4 €/mois**, ajoute les équipes, la personnalisation des factures et les rapports avancés. Le menu permet de changer d’espace et s’ouvre par glissement depuis le bord gauche sur téléphone/tablette. Voir [le guide des offres, de Stripe et des nouveaux espaces](docs/PLANS_AND_WORKSPACES.md) pour la configuration, les migrations et les tests. Ces changements doivent être déployés pour apparaître sur le site en ligne.
 
 **Application en ligne : [orange-finance.onrender.com](https://orange-finance.onrender.com).** Déployée sur Render à Francfort avec PostgreSQL et stockage privé persistant. Voir [le suivi du déploiement](DEPLOYMENT.md).
+
+**Nom confirmé le 11 octobre 2026 : Orando**, présenté comme **Orando Finance** dans les boutiques. Le changement concerne le nom affiché ; l’URL de production et les identifiants techniques restent inchangés. Cette mise à jour du dépôt ne constitue pas un déploiement ni une modification des fiches distantes. Voir [les précisions de publication](docs/mobile/STORES.md#nom-de-lapplication--11-octobre-2026).
 
 ## Encaisser et travailler au quotidien
 
@@ -20,7 +22,7 @@ Sur téléphone, le bouton **Saisir** reste accessible dans la barre inférieure
 
 **Journal quotidien** regroupe les mouvements du jour avec recherche par personne, téléphone, motif, numéro, référence ou montant. Les journées correspondent au fuseau de l’appareil ; les totaux couvrent tous les résultats filtrés, même sur plusieurs pages. Les transferts internes n’augmentent pas le net de l’entreprise. Les commerciaux et caissiers voient les mouvements et totaux de leurs portefeuilles ou caisses autorisés.
 
-Les reçus PDF privés sont téléchargeables et imprimables depuis le succès d’un encaissement, le journal et les fiches transaction/paiement/dépense payée. Le numéro et les informations sont figés lors de la première émission, distincte de la date du mouvement. Toute annulation ultérieure est signalée lors d’un nouveau téléchargement. Un PDF déjà remis ne peut pas être rappelé : transmettre l’avis d’annulation et vérifier l’état actuel dans Orange. Ce reçu d’enregistrement ne remplace ni une facture ni une signature du bénéficiaire. Aucun numéro de téléphone, compte du bénéficiaire ou envoi SMS n’est obligatoire.
+Les reçus PDF privés sont téléchargeables et imprimables depuis le succès d’un encaissement, le journal et les fiches transaction/paiement/dépense payée. Le numéro et les informations sont figés lors de la première émission, distincte de la date du mouvement. Toute annulation ultérieure est signalée lors d’un nouveau téléchargement. Un PDF déjà remis ne peut pas être rappelé : transmettre l’avis d’annulation et vérifier l’état actuel dans Orando. Ce reçu d’enregistrement ne remplace ni une facture ni une signature du bénéficiaire. Aucun numéro de téléphone, compte du bénéficiaire ou envoi SMS n’est obligatoire.
 
 Utilisation sur téléphone, tablette et PC, avec une connexion Internet pour enregistrer les opérations. Les liens de justificatifs ouvrent la fiche privée pour prendre une photo ou joindre un fichier. La préparation d’une future connexion ERP est décrite dans [le contrat d’export comptable](docs/ACCOUNTING_INTEGRATION.md).
 

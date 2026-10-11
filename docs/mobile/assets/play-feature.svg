@@ -11,7 +11,7 @@
     <path d="M133 56a56 56 0 1 0 19 51h-33a24 24 0 1 1-8-30z" fill="white"/>
     <circle cx="145" cy="49" r="14" fill="#ffd29c"/>
   </g>
-  <text x="120" y="90" fill="#243c45" font-family="Arial,sans-serif" font-size="29" font-weight="700">Orange Finance</text>
+  <text x="120" y="90" fill="#243c45" font-family="Arial,sans-serif" font-size="29" font-weight="700">Orando Finance</text>
   <text x="58" y="219" fill="#243c45" font-family="Arial,sans-serif" font-size="53" font-weight="700">Chaque paiement.</text>
   <text x="58" y="282" fill="#b54c27" font-family="Arial,sans-serif" font-size="53" font-weight="700">Une trace claire.</text>
   <text x="60" y="357" fill="#5b6d75" font-family="Arial,sans-serif" font-size="23">Encaissements · Dépenses · Reçus</text>

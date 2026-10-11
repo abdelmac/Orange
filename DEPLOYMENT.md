@@ -1,6 +1,45 @@
 # Déploiement de production sur Render
 
-Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orange à Francfort avec PostgreSQL 17 et un disque privé pour les justificatifs. Le déploiement local Docker reste disponible.
+Le dépôt contient un Blueprint [render.yaml](render.yaml) pour déployer Orando à Francfort avec PostgreSQL 17 et un disque privé pour les justificatifs. Le déploiement local Docker reste disponible.
+
+## Renommage Orando — 11 octobre 2026
+
+Le nom affiché devient **Orando Finance**, avec **Orando** comme nom court. Les écrans web, métadonnées, manifeste PWA, page hors connexion, nouveaux documents générés, noms de téléchargements, libellés iOS/Android et visuels des boutiques sont adaptés. Le cache hors connexion est renouvelé avec suppression de ses versions précédentes.
+
+Le produit et le portail Stripe réels ont été renommés **Orando Finance PRO** à 17:20 UTC. Le tarif, les identifiants, les abonnements et les réglages du portail sont conservés. Le nom public du compte Stripe contient encore l’ancienne marque : sa modification utilise le [Dashboard Stripe](https://dashboard.stripe.com/settings/account), selon [la documentation de l’API](https://docs.stripe.com/api/accounts/update). Aucun achat ou débit n’a été créé pendant le renommage.
+
+Validation locale : TypeScript, lint, 49 tests unitaires, build de production, sept contrôles PostgreSQL de factures dans un schéma isolé et contrôles Chrome des cinq pages publiques, du manifeste et de la page hors connexion réussis. Les identifiants de connexion, clés d’idempotence Stripe, schémas d’export, identifiants des applications, nom de base et URLs existantes restent stables ; aucune migration n’est nécessaire. Le renommage du code ne modifie pas l’identité juridique des entreprises ni les pièces déjà remises. La publication de cette révision doit être confirmée ci-dessous après déploiement.
+
+## Stripe en production — 11 octobre 2026
+
+La configuration Stripe réelle est déployée sur **https://orange-finance.onrender.com**, page **[/abonnement](https://orange-finance.onrender.com/abonnement)**. Le déploiement Render `dep-db5ebrtckfvc739tpeeg` est `live` depuis **01:30:10 UTC (03:30:10 à Paris)**, sur la révision existante `d1d0e891fc1116d25935d921c570e83d9381d8dc`. La compilation, la phase préalable au déploiement et le redémarrage ont réussi. Aucun changement de code applicatif ou de schéma n’a été ajouté pour cette activation.
+
+- Tarif réel actif : `price_1UPAxYIzz0i5GW38YVHlLMb1`, **4,00 EUR par mois**, quantité 1. Le compte Stripe accepte les paiements et les versements.
+- Webhook réel `we_1UPBWyIzz0i5GW38pANvOpWf`, activé vers `https://orange-finance.onrender.com/api/billing/webhook`, événements snapshot en version `2026-08-26.dahlia` : `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
+- Portail client réel par défaut `bpc_1UPBWzIzz0i5GW387CVkhh9V` : historique des factures, modification du moyen de paiement et résiliation en fin de période sans prorata. Les changements de tarif et de quantité sont désactivés.
+- Variables privées mises à jour sur le service Render : `STRIPE_SECRET_KEY`, `STRIPE_PRO_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `APP_URL`. Les autres variables sont conservées. Cette mise à jour a déclenché le déploiement ci-dessus ; le déploiement automatique depuis Git reste désactivé.
+
+**Vérifications réussies à 01:30:40 UTC :** santé PostgreSQL, `/login`, connexion administrateur avec cookie Secure/HttpOnly, accès authentifié à `/api/me`, `/api/dashboard`, `/api/billing` et `/abonnement`, configuration de facturation reconnue et refus des accès anonymes. Une sonde synthétique d’un type d’événement ignoré par le métier est acceptée avec la bonne signature, et refusée sans signature ou avec un corps modifié. Le tarif, le webhook et le portail par défaut ont aussi été relus via l’API Stripe réelle.
+
+Ces contrôles ne constituent **ni un achat réel, ni une livraison d’événement depuis Stripe**. Aucune session Checkout, aucun abonnement et aucun paiement réels n’ont été créés pour ces vérifications. L’activation PRO consécutive à un premier achat réel reste à confirmer. La connexion de contrôle crée puis ferme sa session ; la lecture de facturation peut initialiser les métadonnées locales de plan, sans écriture financière.
+
+La préparation privée est conservée dans `.local/stripe-production.env`, ignoré par Git et non chargé par le serveur local. La clé réelle accidentellement placée dans `.env` a été déplacée vers ce fichier ; `STRIPE_SECRET_KEY` local est désormais vide. **Restaurer une clé de test `sk_test_…` dans `.env` avant les prochains essais locaux**, en conservant le tarif de test et le secret du listener local. Aucun secret ne figure dans ce document. Le rapport de contrôle sans secrets se trouve dans `.local/stripe-live-verification.json`, également ignoré par Git.
+
+## Incident résolu — 11 octobre 2026
+
+**Le site public est de nouveau disponible : https://orange-finance.onrender.com.** La reprise de la base existante depuis le Dashboard Render a rétabli l’accès. Avant cette reprise, `/login` et `/api/health` retournaient HTTP 502 et les journaux indiquaient que l’application ne pouvait pas joindre PostgreSQL.
+
+Constats du diagnostic auprès de Render :
+
+- La base `dpg-dai023ijnfac73acjtpg-a` était `suspended`, avec `suspenders: ["user"]`. Sa métadonnée `updatedAt` valait `2026-10-06T12:12:53Z` ; elle ne prouve pas l’heure exacte de début de suspension.
+- Au moment du rétablissement, la révision marquée `live` était `d1d0e891fc1116d25935d921c570e83d9381d8dc`, déploiement `dep-dask5vnpn0mc738pa1bg` terminé le 27 septembre 2026 à 16:26:47 UTC. Aucun nouveau déploiement n’a été nécessaire pour ce rétablissement. Le redéploiement Stripe décrit ci-dessus a eu lieu ensuite.
+- La tentative manuelle du 10 octobre 2026 à 23:46 UTC, `dep-db5csprrjlhs73d7p8rg`, a échoué en `pre_deploy_failed` parce que la base était inaccessible.
+
+**Rétablissement confirmé à 00:24 UTC (02:24 à Paris) :** l’utilisateur a lancé **Resume Database** dans la [base Render existante](https://dashboard.render.com/d/dpg-dai023ijnfac73acjtpg-a). PostgreSQL est désormais `available`, `not_suspended`, sans suspendeur. Le plan et le stockage sont inchangés. Aucun remplacement de base ni aucune migration n’ont été effectués pour cette réparation. Le connecteur MCP disponible ne propose pas l’action de reprise et le jeton CLI local reste expiré ; une future reprise manuelle utilise **Info → Resume Database**. Voir la [procédure Render](https://render.com/docs/postgresql-creating-connecting#running-out-of-storage).
+
+Vérifications après reprise réussies : HTTP 200 et `status: ok` sur `/api/health`, HTTP 200 sur `/login`, connexion administrateur avec cookie Secure/HttpOnly, lecture authentifiée de `/api/me`, `/api/dashboard` et `/api/daybook`, refus HTTP 401 de `/api/me` sans session, puis déconnexion de la session de contrôle. Aucune opération financière de test n’a été créée. Le rapport sans identifiants est conservé dans `.local/production-recovery-verification.json`, exclu de Git. Aucun nouveau message d’erreur applicatif ni PostgreSQL `ERROR/FATAL/PANIC` n’a été observé entre 00:13 et 00:23:51 UTC.
+
+Les sections datées ci-dessous conservent l’historique des vérifications de l’époque. Leurs affirmations sur les versions encore non publiées et le « dernier déploiement confirmé » ne décrivent plus l’état actuel ; seules les constatations ci-dessus ont été revérifiées le 11 octobre.
 
 ## État du déploiement — 25 septembre 2026
 
@@ -35,7 +74,7 @@ Vérifications après publication réussies : connexion administrateur, PostgreS
 - [Base PostgreSQL existante](https://dashboard.render.com/d/dpg-dai023ijnfac73acjtpg-a), accès réseau privé uniquement.
 - Région : Francfort ; disque privé monté sur `/var/data`, capacité 1 Go.
 - Version initiale : `f38f8b1777493bb348a2154e60a7fc5ef1a8da06` ; remplacée par la mise à jour décrite ci-dessus.
-- Entreprise initialisée : **Orange**, une caisse vide et un administrateur utilisant l’adresse du compte Render authentifié. Les données locales de démonstration et de test n’ont pas été importées.
+- Entreprise initialisée : **Orange** (nom historique enregistré le 11 septembre 2026), une caisse vide et un administrateur utilisant l’adresse du compte Render authentifié. Les données locales de démonstration et de test n’ont pas été importées.
 
 Les ressources ont été créées via l’API Render avec la configuration de `render.yaml`. Pour mettre cette installation à jour, redéployer le service existant ; ne pas recréer la base ni relancer l’initialisation de l’entreprise.
 

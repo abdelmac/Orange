@@ -1,4 +1,4 @@
-# Orange — plan d’implémentation
+# Orando — plan d’implémentation
 
 ## Évolution FREE / PRO et finances personnelles — 27 septembre 2026
 

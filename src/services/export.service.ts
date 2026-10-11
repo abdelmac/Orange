@@ -565,7 +565,7 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
         return new Response(csv, {
           headers: {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": `attachment; filename="orange-${type}-${day(new Date())}.csv"`,
+            "Content-Disposition": `attachment; filename="orando-${type}-${day(new Date())}.csv"`,
             "Cache-Control": "private, no-store",
           },
         });
@@ -587,7 +587,7 @@ export async function exportReport(actor: Actor, params: URLSearchParams) {
       return new Response(new Uint8Array(bytes), {
         headers: {
           "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="orange-${type}.pdf"`,
+          "Content-Disposition": `attachment; filename="orando-${type}.pdf"`,
           "Cache-Control": "private, no-store",
         },
       });

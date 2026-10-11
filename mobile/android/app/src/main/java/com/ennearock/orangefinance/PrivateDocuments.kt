@@ -70,7 +70,7 @@ class PrivateDocuments(
                 if (!AppPolicy.isPrivateAttachment(url)) check(mime == "application/pdf") { "Le serveur n’a pas renvoyé un PDF." }
                 check(connection.contentLengthLong <= AppPolicy.MAX_DOCUMENT_BYTES) { "Ce document dépasse 20 Mo." }
                 val folder = File(context.cacheDir, "receipts").also { it.mkdirs() }
-                val target = File(folder, "orange-${UUID.randomUUID()}.$extension")
+                val target = File(folder, "orando-${UUID.randomUUID()}.$extension")
                 file = target
                 connection.inputStream.use { input ->
                     target.outputStream().use { output ->
@@ -107,7 +107,7 @@ class PrivateDocuments(
                     val send = Intent(Intent.ACTION_SEND).apply {
                         type = mime
                         putExtra(Intent.EXTRA_STREAM, uri)
-                        clipData = ClipData.newRawUri("Document Orange Finance", uri)
+                        clipData = ClipData.newRawUri("Document Orando Finance", uri)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     try { context.startActivity(Intent.createChooser(send, "Ouvrir ou partager le document")) }

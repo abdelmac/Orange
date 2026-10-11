@@ -1,4 +1,4 @@
-const CACHE = "orange-offline-v2";
+const CACHE = "orando-offline-v3";
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(["/offline.html", "/icon.svg"])));
   self.skipWaiting();
@@ -10,7 +10,11 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("orange-offline-") && key !== CACHE)
+            .filter(
+              (key) =>
+                (key.startsWith("orange-offline-") || key.startsWith("orando-offline-")) &&
+                key !== CACHE,
+            )
             .map((key) => caches.delete(key)),
         ),
       ),

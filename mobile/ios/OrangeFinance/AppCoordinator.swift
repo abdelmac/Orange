@@ -155,7 +155,7 @@ final class AppCoordinator: NSObject, WKHTTPCookieStoreObserver, UITabBarControl
         if UIPrintInteractionController.canPrint(file) { alert.addAction(UIAlertAction(title: "Imprimer", style: .default) { [weak self, weak presenter] _ in
             guard let self, let presenter else { return }
             let printController = UIPrintInteractionController.shared
-            let info = UIPrintInfo(dictionary: nil); info.jobName = "Reçu Orange Finance"; info.outputType = .general
+            let info = UIPrintInfo(dictionary: nil); info.jobName = "Reçu Orando Finance"; info.outputType = .general
             printController.printInfo = info; printController.printingItem = file
             let completion: (UIPrintInteractionController, Bool, Error?) -> Void = { [weak self] _, _, _ in self?.pdfs.remove(file) }
             if UIDevice.current.userInterfaceIdiom == .pad { printController.present(from: self.anchor(in: presenter), in: presenter.view, animated: true, completionHandler: completion) }

@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const response = json(data);
     response.headers.set(
       "Content-Disposition",
-      `attachment; filename="orange-comptabilite-v1-page-${data.page}.json"`,
+      `attachment; filename="orando-comptabilite-v1-page-${data.page}.json"`,
     );
     return response;
   });
